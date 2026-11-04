@@ -14,6 +14,7 @@ window.BAKERY_TG_CONFIG = {
 <!-- Адаптер Telegram: WebView, облачные сейвы, тактильный отклик.
      Подключается в <head>, чтобы ядро игры сразу увидело window.BAKERY_CLOUD -->
 <script src="./tg-adapter.js"></script>
+<script src="./cloud-saves.js"></script>
 <title>Булочная империя</title>
 <!-- HANDOFF (для другой нейросети): HTML-кликер про пекарню, один файл. Сборка под Telegram Mini Apps (build.py). Баланс в блоке "ДАННЫЕ". Валюты: монеты, кристаллы 💎. Есть: квесты-сюжет Q, достижения ACH, пропуск (free/premium), магазин SHOP/REAL, закваска (престиж, после квеста 8), SVG-фоны по стадиям (bgsvg), автосохранение localStorage 'bakery_v2' + Telegram CloudStorage (чанки по 4096 символов) + свой бэкенд на Cloudflare Workers. Оплата — Telegram Stars (XTR) через /api/invoice воркера. -->
 
@@ -2769,11 +2770,7 @@ window.bakerySdkReady=Promise.resolve(null);
 try{(function(){
   var C=window.BAKERY_CLOUD;if(!C||!C.available())return;
   player=C.makePlayer();
-  C.loadSave().then(function(d){
-    if(d&&d.S&&((d.S.total||0)>S.total||!localSaveFound||(Number(d.S.last)||0)>(Number(S.last)||0))){
-      S=Object.assign(fresh(),d.S);buildUps(1);try{roll()}catch(_){}try{ui()}catch(_){}try{save()}catch(_){}
-    }
-  }).catch(function(){});
+  C.connect({read:function(){return S},hasLocal:localSaveFound,apply:function(data){S=Object.assign(fresh(),data);buildUps(1);try{roll();ui()}catch(_){}},backup:function(){localStorage.setItem('bakery_before_cloud_'+Date.now(),JSON.stringify(S))}});
 })()}catch(e){}
 function save(){S.last=now();try{localStorage.setItem('bakery_v2',JSON.stringify(S))}catch(e){}if(player&&now()-lastCloud>30000){lastCloud=now();player.setData({S}).catch(()=>{})}}
 const $=id=>document.getElementById(id);
