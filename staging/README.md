@@ -70,3 +70,13 @@ Four local tests pass, including generated staging code tested with an in-memory
 Root cause reproduced: base BUILD has 12 entries, seasonal additions push santaSleigh and giftFactory, and game expands own to 14. Both validators required exactly 12. Client copy() rejects the expanded save before PUT, so that message is not evidence of a server rejection. Accept only existing lengths 12 or 14 with nonnegative safe integer counts; preserve all fields and counts. Authorization, revision envelope and 256 KiB bound unchanged.
 
 New test executes actual BUILD declarations, seasonal additions and fresh() from index.html, tests both validators, unsupported length, negative counts and oversized client JSON. Actual fresh fixture is 519 UTF-8 bytes; PUT envelope {revision:0,data:state} is 541 bytes. This is not the user's private save size. Five tests and syntax checks passed. Real signed Telegram write remains pending relaunch and cloud selection.
+
+## Final available verification 2026-11-05
+
+Actual tester row read from remote staging D1: exists, revision=4, 819 UTF-8 bytes, 12 production entries, updated_at=2026-11-05 10:10:25 UTC. No user save data printed or modified. Revision 4 confirms initial creation and subsequent successful updates under the deployed API. Independent signed recovery across devices is not yet established.
+
+Stale diagnostic root cause: it fetched GET once before initial PUT and retained revision=0. Added periodic metadata refresh every 30 seconds and a regression test proving 0 -> 4 display update; no raw initData logged. Six Node tests pass. Edge browser test passes mocked initial migration, conflict/write pause, explicit recovery, reopen, offline retry with prestige-like reset state. Actual prestige button and two-device Telegram flow remain manual gaps.
+
+Real HTTP suite tests/staging-http.ps1 passes anonymous GET/PUT, forged auth, foreign origin, disabled webhook/invoice and staging endpoint isolation. Use it instead of unstable Node fetch HTTP checks; no auth bypass. Existing remote D1 SQL checks also passed with temporary qa rows removed. User row was read only.
+
+Release remains gated on real two-device restoration/conflict/offline tests, current production export/schema compatibility and production backup before separately approved release. Client economy remains editable; no trusted paid balance or leaderboard enabled by this work. Bot metadata instructions and release/rollback sequence remain in BOT_SETUP.md and this file.
