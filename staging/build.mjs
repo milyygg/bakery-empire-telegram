@@ -39,6 +39,7 @@ fs.mkdirSync(path.join(dir,'public'),{recursive:true});
 for (const file of ['index.html','tg-adapter.js','tg-leaderboard.js','cloud-saves.js']) {
   let s = fs.readFileSync(path.join(root,file),'utf8');
   s = s.replaceAll('https://bakery-empire-bot.miloserdovfeed.workers.dev/api/save',origin+'/api/save');
+  if(file==='cloud-saves.js') s=s.replace("var r=await fetch(endpoint", "if(method==='PUT')window.dispatchEvent(new Event('bakery:put'));var r=await fetch(endpoint");
   // Never touch Telegram CloudStorage shared with the live game.
   if (file === 'tg-adapter.js') s = s.replace('return isTG && tg.CloudStorage ? tg.CloudStorage : null;', 'return null;');
   if(file === 'index.html') s=s.replace('./cloud-saves.js','./cloud-saves.js?v=stable3').replace('./tg-adapter.js','./tg-adapter.js?v=diag2').replace('</body>', '<script src="./diagnostics.js?v=3"></script></body>');
