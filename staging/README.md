@@ -40,3 +40,11 @@ Node HTTP-проверка завершилась TimeoutError. Независи
 В @BotFather: /newapp, выбрать @bakeryempirebot, создать отдельную Mini App с названием Bakery Empire Staging, short name bakerystaging и URL https://bakery-empire-staging.miloserdovfeed.workers.dev . Если имя занято, выбрать другое свободное. Картинку предоставить по запросу BotFather. Не менять Main Mini App, текущую bakeryempire и webhook.
 
 Передать публичный числовой ID бота и числовые ID тестировщиков для BOT_ID/TEST_USER_IDS. Токен в чат не нужен. После настройки ожидаемая ссылка: https://t.me/bakeryempirebot/bakerystaging . Само создание приложения в этой проверке не выполнялось.
+
+## Test Mini App setup
+
+Owner created https://t.me/bakeryempirebot/bakerytest . Staging now displays the current Telegram user ID locally; this unverified display is only for allowlist setup, never server authorization. No initData or token is displayed or persisted by this panel.
+
+BOT_ID and TEST_USER_IDS remain empty (fail closed). Public t.me and OAuth embed pages did not expose a verifiable bot ID. Owner can retrieve the numeric prefix before the colon from the existing bot token in BotFather, sending only that numeric ID and never the token or its suffix. No token rotation is necessary. Open bakerytest to read the tester ID; configure exact numeric IDs only, no wildcard. Real signed Telegram API checks remain pending these values and an actual launch.
+
+Staging redeployed with identity panel; three local tests passed. Production, webhook, main and primary Mini App unchanged.
