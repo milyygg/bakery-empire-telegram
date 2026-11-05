@@ -4,8 +4,26 @@
   "account_id": "a5e9df71090a1503a7cb40a645ded0d4",
   "compatibility_date": "2026-11-05",
   "workers_dev": true,
-  "assets": {"directory": "./public", "binding": "ASSETS", "run_worker_first": true},
-  "d1_databases": [{"binding":"DB", "database_name":"bakery-empire-staging-db", "database_id":"7567da6e-59f7-4e36-9efe-41a83b5f849f"}],
-  "vars": {"BOT_ID":"", "TEST_USER_IDS":""},
-  "observability": {"enabled":true, "traces":{"enabled":true}}
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bakery-empire-staging-db",
+      "database_id": "7567da6e-59f7-4e36-9efe-41a83b5f849f"
+    }
+  ],
+  "vars": {
+    "BOT_ID": "549862623",
+    "TEST_USER_IDS": "9268949608"
+  },
+  "observability": {
+    "enabled": true,
+    "traces": {
+      "enabled": true
+    }
+  }
 }

@@ -48,3 +48,11 @@ Owner created https://t.me/bakeryempirebot/bakerytest . Staging now displays the
 BOT_ID and TEST_USER_IDS remain empty (fail closed). Public t.me and OAuth embed pages did not expose a verifiable bot ID. Owner can retrieve the numeric prefix before the colon from the existing bot token in BotFather, sending only that numeric ID and never the token or its suffix. No token rotation is necessary. Open bakerytest to read the tester ID; configure exact numeric IDs only, no wildcard. Real signed Telegram API checks remain pending these values and an actual launch.
 
 Staging redeployed with identity panel; three local tests passed. Production, webhook, main and primary Mini App unchanged.
+
+## Allowlist deployed 2026-11-05
+
+Configured BOT_ID supplied by owner and exactly one authorized tester in staging/wrangler.jsonc. Deployed version e976ded0-c9f8-4ee3-9632-91a15a990425. No production changes.
+
+Three mocked server tests pass. Actual staging D1 write/read and stale revision checks pass, test rows cleaned. Independent HTTP checks: anonymous 401, forged signature for allowlisted user 401, foreign Origin 403, invoice route 404. Full Node HTTP suite timed out and is not a pass.
+
+Next: owner must close and reopen https://t.me/bakeryempirebot/bakerytest, choose staging local progress if prompted, earn a small amount and wait for cloud confirmation. Close/reopen to confirm restoration. Never send initData or tokens. Successful signed API authentication remains unverified until that launch; provided bot ID is not independently verified via getMe.
