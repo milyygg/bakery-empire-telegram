@@ -190,8 +190,8 @@ body{background:#171015}
 @keyframes aura{to{transform:translate(-50%,-48%) scale(1.08);opacity:.75}}
 .crumb{position:fixed;z-index:12;pointer-events:none;font-size:12px;animation:crumb .7s ease-out forwards}
 @keyframes crumb{to{transform:translate(var(--dx),var(--dy)) rotate(220deg) scale(.4);opacity:0}}
-.ripple{position:fixed;z-index:11;pointer-events:none;width:22px;height:22px;border:3px solid #ffe19a;border-radius:50%;transform:translate(-50%,-50%);animation:ripple .55s ease-out forwards;box-shadow:0 0 15px #ffd16688}
-@keyframes ripple{to{width:150px;height:150px;opacity:0;border-width:1px}}
+.ripple{position:fixed;z-index:11;pointer-events:none;width:150px;height:150px;border:2px solid #ffe19a;border-radius:50%;transform:translate(-50%,-50%);animation:ripple .55s ease-out forwards;box-shadow:0 0 15px #ffd16688}
+@keyframes ripple{from{transform:translate(-50%,-50%) scale(.147)}to{transform:translate(-50%,-50%) scale(1);opacity:0}}
 #statusline{position:fixed;left:50%;top:calc(50% + min(30vw,160px));transform:translateX(-50%);z-index:3;pointer-events:none;white-space:nowrap;background:#160d18a8;border:1px solid #ffffff22;border-radius:20px;padding:5px 11px;font-size:11px;color:#f6d9c2;backdrop-filter:blur(7px);box-shadow:0 4px 18px #0005}
 #scene-dust{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden}
 .dust{position:absolute;width:4px;height:4px;border-radius:50%;background:#fff0bd88;box-shadow:0 0 7px #ffe1a866;animation:dust linear infinite}
@@ -2960,7 +2960,26 @@ function spawnGold(){
 // ===== ВИЗУАЛЬНЫЙ СЛОЙ / GAME FEEL =====
 const recipeNames=['Круассан','Багет','Хлеб','Крендель','Кекс','Торт','Кусочек торта','Пончик','Пирог','Бейгл','Печенье','Золотая звезда'];
 const recipeRarity=['Обычная','Обычная','Обычная','Необычная','Необычная','Редкая','Редкая','Редкая','Эпическая','Эпическая','Легендарная','Мифическая'];
-function hitFX(x,y){if(S.quality==='performance')return;const r=document.createElement('div');r.className='ripple';r.style.left=x+'px';r.style.top=y+'px';document.body.appendChild(r);setTimeout(()=>r.remove(),650);const icons=['✦','•','✧','🍞'];for(let i=0;i<4;i++){const c=document.createElement('div');c.className='crumb';c.textContent=icons[i];c.style.left=x+(Math.random()*28-14)+'px';c.style.top=y+(Math.random()*20-10)+'px';c.style.setProperty('--dx',(Math.random()*100-50)+'px');c.style.setProperty('--dy',(-35-Math.random()*45)+'px');document.body.appendChild(c);setTimeout(()=>c.remove(),800)}}
+const idleBursts = [], activeBursts = new Set();
+function makeBurst(){
+ const group=document.createElement('div');group.style.display='contents';
+ for(const [index,icon] of ['', '✦','•','✧','🍞'].entries()){
+  const part=document.createElement('div');part.className=index?'crumb':'ripple';part.textContent=icon;group.append(part);
+ }
+ return group;
+}
+function hitFX(x,y){
+ if(S.quality==='performance')return;
+ const group=idleBursts.pop()||makeBurst();
+ for(const part of group.children){
+  const crumb=part.className==='crumb';part.style.left=(x+(crumb?Math.random()*28-14:0))+'px';part.style.top=(y+(crumb?Math.random()*20-10:0))+'px';
+  if(crumb){part.style.setProperty('--dx',(Math.random()*100-50)+'px');part.style.setProperty('--dy',(-35-Math.random()*45)+'px')}
+ }
+ document.body.append(group);activeBursts.add(group);
+ function recycle(){group.remove();activeBursts.delete(group);clearTimeout(group.burstTimer);if(idleBursts.length<12)idleBursts.push(group)}
+ group.recycle=recycle;group.burstTimer=setTimeout(recycle,800);
+ if(activeBursts.size>12)activeBursts.values().next().value.recycle();
+}
 function bakeryDust(){const box=$('scene-dust'),mobile=window.matchMedia&&window.matchMedia('(max-width:600px)').matches,want=mobile?0:(S.quality==='performance'?3:18);if(box.childElementCount===want)return;box.innerHTML='';for(let i=0;i<want;i++){const d=document.createElement('i');d.className='dust';d.style.left=Math.random()*100+'%';d.style.animationDelay=(-Math.random()*12)+'s';d.style.animationDuration=(9+Math.random()*10)+'s';d.style.setProperty('--x',(Math.random()*120-60)+'px');box.appendChild(d)}}
 bakeryDust();setTimeout(visitor,90000);setInterval(()=>{if(Math.random()<.85)visitor()},240000+Math.random()*120000);
 function productionStrip(){const el=$('production-strip');if(!el)return;let list=BUILD.map((b,i)=>({b,i,l:S.own[i]})).filter(x=>x.l>0).slice(0,5);if(!list.length)list=[{b:BUILD[0],i:0,l:0}];const html=list.map((x,n)=>`<div class="prod" title="${x.b.n}"><span class="pi">${x.b.i}</span><small>${x.l?fmt(x.l):'—'}</small></div>`).join('');if(el.dataset.h!==html){el.dataset.h=html;el.innerHTML=html}}

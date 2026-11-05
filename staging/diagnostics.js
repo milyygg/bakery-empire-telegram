@@ -7,13 +7,20 @@
   copy.hidden = true;
   for (const btn of [run, copy]) btn.style = 'background:#452b20;color:#fff4df;border:1px solid #bb935f;border-radius:8px;padding:8px;margin:4px';
   result.style = 'font:14px/1.4 system-ui;user-select:text';
-  panel.append(title,run,result,copy);
+  const mode=el('select');mode.setAttribute?.('aria-label','Эффекты во время замера');
+  for(const [value,label] of [['all','Все эффекты'],['burst','Без кольца и крошек'],['numbers','Без всплывающих чисел'],['filters','Без фильтров сцены']]){const option=el('option');option.value=value;option.textContent=label;mode.append(option)}
+  panel.append(title,mode,run,result,copy);
   const tab = window.tab;
   if(typeof tab==='function') window.tab=function(...args){const value=tab.apply(this,args);if(args[0]==='set')queueMicrotask(()=>{const host=document.querySelector('#p_dyn');if(T==='set'&&host&&!host.contains(panel))host.append(panel)});return value};
   copy.onclick = async () => {try{await navigator.clipboard.writeText(result.textContent);copy.textContent='Скопировано'}catch{const range=document.createRange();range.selectNodeContents(result);const selection=getSelection();selection.removeAllRanges();selection.addRange(range);copy.textContent='Скопируйте выделенный текст'}};
   run.onclick = () => {
     if(run.disabled)return;
-    run.disabled=true;copy.hidden=true;result.textContent='Вернитесь в игру на 15 секунд.';
+    const variant=mode.value, originalBurst=window.hitFX, originalNumber=window.fl;
+    const style=el('style');
+    if(variant==='burst')window.hitFX=()=>{};
+    if(variant==='numbers')window.fl=()=>{};
+    if(variant==='filters'){style.textContent='#bg svg,#center,#bun .pastry-hero,.bub,.reward-orb{filter:none!important;backdrop-filter:none!important}';document.head.append(style)}
+    mode.disabled=true;run.disabled=true;copy.hidden=true;result.textContent='Вернитесь в игру на 15 секунд.';
     const groups=new Map(), intervals=[], observers=[];
     let longMs=0,requests=0,saves=0,records=0,frame,last=0;
     const start=performance.now();
@@ -24,10 +31,10 @@
     mutations.observe(document.body,{attributes:true,subtree:true,childList:true,characterData:true});
     const onPut=()=>saves++;window.addEventListener('bakery:put',onPut);
     function tick(t){if(last)intervals.push(t-last);last=t;frame=requestAnimationFrame(tick)}frame=requestAnimationFrame(tick);
-    setTimeout(()=>{cancelAnimationFrame(frame);mutations.disconnect();observers.forEach(o=>o.disconnect());window.removeEventListener('bakery:put',onPut);
+    setTimeout(()=>{cancelAnimationFrame(frame);mutations.disconnect();if(variant==='burst')window.hitFX=originalBurst;if(variant==='numbers')window.fl=originalNumber;style.remove();mode.disabled=false;observers.forEach(o=>o.disconnect());window.removeEventListener('bakery:put',onPut);
       const sec=(performance.now()-start)/1000;intervals.sort((a,b)=>a-b);const p95=intervals[Math.max(0,Math.ceil(intervals.length*.95)-1)];const fps=(intervals.length+1)/sec;
       const top=[...groups].sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k} ${(v/sec).toFixed(0)}/с`).join(', ');
-      result.textContent=`FPS ${fps.toFixed(1)}, кадр в среднем ${(1000/fps).toFixed(1)} мс, p95 ${p95?.toFixed(1)??'н/д'} мс (низкий FPS ${p95?(1000/p95).toFixed(1):'н/д'}). Записи MutationObserver ${(records/sec).toFixed(1)}/с (${top}). Длинные задачи ${hasLong?Math.round(longMs)+' мс':'н/д'}. HTTP ${requests}, PUT ${saves}.`;
+      result.textContent=`Режим ${variant}. FPS ${fps.toFixed(1)}, кадр в среднем ${(1000/fps).toFixed(1)} мс, p95 ${p95?.toFixed(1)??'н/д'} мс (низкий FPS ${p95?(1000/p95).toFixed(1):'н/д'}). Записи MutationObserver ${(records/sec).toFixed(1)}/с (${top}). Длинные задачи ${hasLong?Math.round(longMs)+' мс':'н/д'}. HTTP ${requests}, PUT ${saves}.`;
       copy.hidden=false;copy.textContent='Скопировать';run.disabled=false;run.textContent='Повторить замер';
     },15000);
   };
