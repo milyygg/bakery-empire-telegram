@@ -22,3 +22,21 @@ Pending: real valid Telegram initData, API writes/reads across two authorized us
 Next: obtain owner approval to create a separate named staging Mini App under the existing bot, leaving its current Main Mini App and webhook unchanged. Retrieve its public bot ID and agree tester IDs. Configure staging only, then test valid Ed25519 authentication. No real purchases.
 
 Sources: https://core.telegram.org/bots/webapps#validating-data-for-third-party-use ; https://developers.cloudflare.com/workers/static-assets/binding/
+
+## Продолжение проверки 2026-11-05
+
+Повторно подтверждены три локальных серверных теста, сборка staging и синтаксис cloud-saves.js и staging/worker.mjs. Настоящая staging D1 прошла INSERT/SELECT, условное обновление revision и отказ устаревшей revision; созданные qa-записи удалены. Это последовательные SQL-операции, не одновременные запросы API.
+
+Node HTTP-проверка завершилась TimeoutError. Независимый Invoke-WebRequest подтвердил /api/save = 401, / = 200 и /cloud-saves.js = 200. Полный интеграционный тест не считается пройденным.
+
+### Выпуск и откат
+
+До выпуска: проверить настоящий Telegram initData на staging, двух пользователей и два устройства, офлайн/конфликт/престиж; получить актуальный production Worker и схему D1; экспортировать резервную копию D1 и сохранить текущие версии Worker/frontend. Проверить совместимость существующих таблиц с новым API без удаления данных.
+
+После отдельного подтверждения владельца: сначала совместимый Worker, затем frontend; проверить авторизованное чтение/запись и запуск. При ошибке вернуть предыдущие Worker и frontend. Откат кода не откатывает D1; не удалять таблицы и не восстанавливать старую БД поверх новых сохранений без отдельного анализа.
+
+### Действия в BotFather
+
+В @BotFather: /newapp, выбрать @bakeryempirebot, создать отдельную Mini App с названием Bakery Empire Staging, short name bakerystaging и URL https://bakery-empire-staging.miloserdovfeed.workers.dev . Если имя занято, выбрать другое свободное. Картинку предоставить по запросу BotFather. Не менять Main Mini App, текущую bakeryempire и webhook.
+
+Передать публичный числовой ID бота и числовые ID тестировщиков для BOT_ID/TEST_USER_IDS. Токен в чат не нужен. После настройки ожидаемая ссылка: https://t.me/bakeryempirebot/bakerystaging . Само создание приложения в этой проверке не выполнялось.
