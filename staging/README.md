@@ -64,3 +64,9 @@ Observed Telegram initDataUnsafe.user.id was 549862623. The panel never read BOT
 Both diagnostic and synchronization requests use nonempty WebApp.initData in Authorization: tma, not initDataUnsafe. Public key, canonical sorting, excluded hash/signature, newline encoding and bot ID prefix checked against https://core.telegram.org/bots/webapps#validating-data-for-third-party-use . User identity is parsed only after signature verification. Panel labels its unsafe ID as unverified.
 
 Four local tests pass, including generated staging code tested with an in-memory fixture public key: correct bot accepted, wrong bot 401, signed unlisted user 403, tampering 401. Fixture key is never written to deployment. These are not real Telegram tests. Next: relaunch bakerytest and observe API 200 and cloud save; query D1 after real launch.
+
+## Seasonal save compatibility fix
+
+Root cause reproduced: base BUILD has 12 entries, seasonal additions push santaSleigh and giftFactory, and game expands own to 14. Both validators required exactly 12. Client copy() rejects the expanded save before PUT, so that message is not evidence of a server rejection. Accept only existing lengths 12 or 14 with nonnegative safe integer counts; preserve all fields and counts. Authorization, revision envelope and 256 KiB bound unchanged.
+
+New test executes actual BUILD declarations, seasonal additions and fresh() from index.html, tests both validators, unsupported length, negative counts and oversized client JSON. Actual fresh fixture is 519 UTF-8 bytes; PUT envelope {revision:0,data:state} is 541 bytes. This is not the user's private save size. Five tests and syntax checks passed. Real signed Telegram write remains pending relaunch and cloud selection.

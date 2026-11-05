@@ -26,7 +26,7 @@ const HELP = `🍞 Нажимай на булочку, чтобы зарабат
 const replies = new Map();
 function validSave(s) {
   if (!s || typeof s !== 'object' || Array.isArray(s)) return false;
-  if (!Array.isArray(s.own) || s.own.length !== 12 || !s.own.every(n => Number.isSafeInteger(n) && n >= 0)) return false;
+  if (!Array.isArray(s.own) || ![12,14].includes(s.own.length) || !s.own.every(n => Number.isSafeInteger(n) && n >= 0)) return false;
   if (!['coins','total','resets','last','clicks'].every(k => Number.isFinite(s[k]) && s[k] >= 0)) return false;
   function safe(v, depth = 0) {
     if (depth > 20) return false;

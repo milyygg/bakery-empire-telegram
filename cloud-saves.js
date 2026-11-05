@@ -9,7 +9,7 @@ var acknowledged=null;
 try{acknowledged=JSON.parse(localStorage.getItem('bakery_cloud_ack'))}catch(_){}
 function remember(data){acknowledged={revision:revision,data:data};localStorage.setItem('bakery_cloud_ack',JSON.stringify(acknowledged));}
 var status='Ожидание выбора сохранения';
-function valid(s){return s&&typeof s==='object'&&!Array.isArray(s)&&Array.isArray(s.own)&&s.own.length===12&&s.own.every(n=>Number.isSafeInteger(n)&&n>=0)&&['coins','total','resets','last','clicks'].every(k=>Number.isFinite(s[k])&&s[k]>=0)&&new TextEncoder().encode(JSON.stringify(s)).length<=262144;}
+function valid(s){return s&&typeof s==='object'&&!Array.isArray(s)&&Array.isArray(s.own)&&[12,14].includes(s.own.length)&&s.own.every(n=>Number.isSafeInteger(n)&&n>=0)&&['coins','total','resets','last','clicks'].every(k=>Number.isFinite(s[k])&&s[k]>=0)&&new TextEncoder().encode(JSON.stringify(s)).length<=262144;}
 function copy(s){if(!valid(s))throw Error('Некорректное или слишком большое сохранение');return JSON.parse(JSON.stringify(s));}
 function update(s){status=s;if(button)button.textContent='☁ '+s;}
 async function request(method,data){var controller=new AbortController(),timer=setTimeout(()=>controller.abort(),10000);try{var r=await fetch(endpoint,{method:method,signal:controller.signal,headers:{Authorization:'tma '+tg.initData,'Content-Type':'application/json'},body:data===undefined?undefined:JSON.stringify(data)});var body=await r.json();if(!r.ok){var err=Error(body.error||'Ошибка сети');err.status=r.status;throw err;}if(!Number.isSafeInteger(body.revision)||body.revision<0)throw Error('Неверная версия ответа');return body;}finally{clearTimeout(timer)}}
