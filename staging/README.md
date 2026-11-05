@@ -90,3 +90,15 @@ Confirmed code delays: loading overlay enforces 7000 ms minimum; Telegram.ready 
 Cloud copy simplified, mobile status text enlarged. Identical snapshots continue automatically; unchanged acknowledged remote still continues local. Actual mismatches require choice with local backup. Online event retries pending snapshot immediately; stale revision still yields 409 and pauses writes, never merges balances. Status after PUT only follows successful server confirmation. Diagnostic panel remains staging build only.
 
 Six Node tests and both Edge browser tests passed, plus real PowerShell staging HTTP checks. Real Android native splash timing, true simultaneous two-device changes and device offline restoration after these changes still need one final owner run. Older cloud metadata does not establish a conflict by itself. No user rows edited or deleted.
+
+## Stabilization 2026-11-05
+
+Owner confirmed two-device recovery, offline retries and conflict preservation. Crystal fluctuation 0 -> 5 -> 30 could not be reproduced as data corruption; separate local/cloud snapshots can have different balances, and pre-cloud display uses local state. No real balance edited. Added crystals to version-choice summary. Browser tests now cover actual achievement once-only reward, crystal shop spending at its current 1.3-adjusted price, reload persistence, remote 30-crystal restoration, and offline retry with spent balance 5 (no max or addition merge).
+
+Removed competing gem polling (120 ms), unified counter markup, skipped identical building text writes, and scoped gem-icon observer to added subtree instead of parent-wide scans. Desktop mobile-emulated idle profile over 3 seconds before: production 595 mutations/536 frames, staging 636/541. Local corrected run 569 mutations/476 frames. Runs are unthrottled and variable, not Android FPS evidence; no reproduction of reported 10 FPS. Real Android remains unavailable. Graphics assets unchanged.
+
+Loading screen informational minimum restored to 3 seconds, optional Skip bypasses that minimum while language/game initialization is retained; early Telegram.ready retained. Existing title/tips/creator/progress remain. Cloud choice still waits for game-ready.
+
+Price inversion caused by story order 0,1,3,2 while index prices were 0,250,1200,6000. Swapped only prices for IDs 2/3: display order now 0,250,1200,6000,30000 and unchanged remainder. Purchase ownership IDs and bonuses unchanged; existing purchases retained. Full story-order monotonicity test passes.
+
+Wood/brass location sign and aligned crystal inline flex counter added; mobile screenshot inspected at 390x844. No image assets changed. Historical crystal-loss cause and actual Android performance are unresolved validation limitations, not claimed fixes. Seven Node tests, loading browser, actual economy browser and mocked cloud browser pass; live staging HTTP passes. Production/main/webhook untouched.
