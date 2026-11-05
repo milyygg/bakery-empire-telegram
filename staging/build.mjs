@@ -42,7 +42,7 @@ for (const file of ['index.html','tg-adapter.js','tg-leaderboard.js','cloud-save
   // Never touch Telegram CloudStorage shared with the live game.
   if (file === 'tg-adapter.js') s = s.replace('return isTG && tg.CloudStorage ? tg.CloudStorage : null;', 'return null;');
   if (file === 'index.html') s = s.replace('<head>','<head>\n<meta name="robots" content="noindex,nofollow">').replace('<body>', '<body><div style="position:fixed;top:0;left:0;z-index:99999;background:#a30;color:white;padding:4px">STAGING - отдельные тестовые сохранения</div>');
-  if(file === 'index.html') s=s.replace('</body>', '<script>addEventListener("DOMContentLoaded",()=>{const d=document.createElement("div");d.style.cssText="position:fixed;top:40px;left:8px;z-index:100001;background:white;color:black;padding:8px";d.textContent="STAGING Telegram ID: "+(window.Telegram?.WebApp?.initDataUnsafe?.user?.id || "откройте через Telegram");d.onclick=()=>d.remove();document.body.append(d)});</script></body>');
+  if(file === 'index.html') s=s.replace('</body>', '<script>addEventListener("DOMContentLoaded",()=>{const d=document.createElement("div");d.style.cssText="position:fixed;top:40px;left:8px;z-index:100001;background:white;color:black;padding:8px";d.textContent="STAGING user.id (не проверен сервером): "+(window.Telegram?.WebApp?.initDataUnsafe?.user?.id || "откройте через Telegram");d.onclick=()=>d.remove();document.body.append(d)});</script></body>');
   if(file === 'index.html') s=s.replace('./cloud-saves.js','./cloud-saves.js?v=diag2').replace('./tg-adapter.js','./tg-adapter.js?v=diag2').replace('</body>', '<script src="./diagnostics.js?v=2"></script></body>');
   fs.writeFileSync(path.join(dir,'public',file),s);
 }

@@ -56,3 +56,11 @@ Configured BOT_ID supplied by owner and exactly one authorized tester in staging
 Three mocked server tests pass. Actual staging D1 write/read and stale revision checks pass, test rows cleaned. Independent HTTP checks: anonymous 401, forged signature for allowlisted user 401, foreign Origin 403, invoice route 404. Full Node HTTP suite timed out and is not a pass.
 
 Next: owner must close and reopen https://t.me/bakeryempirebot/bakerytest, choose staging local progress if prompted, earn a small amount and wait for cloud confirmation. Close/reopen to confirm restoration. Never send initData or tokens. Successful signed API authentication remains unverified until that launch; provided bot ID is not independently verified via getMe.
+
+## ID correction and staging Ed25519 tests
+
+Observed Telegram initDataUnsafe.user.id was 549862623. The panel never read BOT_ID. Previous owner-provided IDs appear transposed; staging now uses BOT_ID=9268949608 and TEST_USER_IDS=549862623. Bot ID remains a hypothesis until Telegram signature verifies after relaunch. No signature bypass added.
+
+Both diagnostic and synchronization requests use nonempty WebApp.initData in Authorization: tma, not initDataUnsafe. Public key, canonical sorting, excluded hash/signature, newline encoding and bot ID prefix checked against https://core.telegram.org/bots/webapps#validating-data-for-third-party-use . User identity is parsed only after signature verification. Panel labels its unsafe ID as unverified.
+
+Four local tests pass, including generated staging code tested with an in-memory fixture public key: correct bot accepted, wrong bot 401, signed unlisted user 403, tampering 401. Fixture key is never written to deployment. These are not real Telegram tests. Next: relaunch bakerytest and observe API 200 and cloud save; query D1 after real launch.

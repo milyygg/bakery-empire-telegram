@@ -17,8 +17,8 @@
     }
   ],
   "vars": {
-    "BOT_ID": "549862623",
-    "TEST_USER_IDS": "9268949608"
+    "BOT_ID": "9268949608",
+    "TEST_USER_IDS": "549862623"
   },
   "observability": {
     "enabled": true,
