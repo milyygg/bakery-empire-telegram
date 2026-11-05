@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><!-- Telegram Mini App: SDK и адаптер подключаются ниже. --><!-- Telegram Mini Apps SDK -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>try{window.Telegram?.WebApp?.ready();performance.mark("telegram-ready")}catch(e){}</script>
 <!-- Настройки платформы (читает tg-adapter.js) -->
 <script>
 window.BAKERY_TG_CONFIG = {
@@ -2770,7 +2771,8 @@ window.bakerySdkReady=Promise.resolve(null);
 try{(function(){
   var C=window.BAKERY_CLOUD;if(!C||!C.available())return;
   player=C.makePlayer();
-  C.connect({read:function(){return S},hasLocal:localSaveFound,apply:function(data){S=Object.assign(fresh(),data);buildUps(1);try{roll();ui()}catch(_){}},backup:function(){localStorage.setItem('bakery_before_cloud_'+Date.now(),JSON.stringify(S))}});
+  const connectCloud=()=>C.connect({read:function(){return S},hasLocal:localSaveFound,apply:function(data){S=Object.assign(fresh(),data);buildUps(1);try{roll();ui()}catch(_){}},backup:function(){localStorage.setItem('bakery_before_cloud_'+Date.now(),JSON.stringify(S))}});
+  if(document.documentElement.classList.contains('app-ready'))connectCloud();else document.addEventListener('bakery:game-ready',connectCloud,{once:true});
 })()}catch(e){}
 function save(){S.last=now();try{localStorage.setItem('bakery_v2',JSON.stringify(S))}catch(e){}if(player&&now()-lastCloud>30000){lastCloud=now();player.setData({S}).catch(()=>{})}}
 const $=id=>document.getElementById(id);
@@ -3124,7 +3126,7 @@ setInterval(save,10000);addEventListener('beforeunload',save);document.addEventL
  window.decorateScene=function(si){const lines=[['Дедушка: «Наша лавка становится всё уютнее.»','Покупатель: «Ещё тёплый хлеб? Беру два!»'],['Дедушка: «Семейный рецепт путешествует дальше.»','Пекарь: «Пироги сегодня разлетятся мгновенно.»'],['Пекарь: «У городской витрины уже очередь!»','Дедушка: «Город знает вкус настоящей выпечки.»'],['Дедушка: «Завод большой, а забота о тесте всё та же.»','Пекарь: «Каждая печь работает как часы.»'],['Гость с Луны: «Здесь пахнет домом, даже среди звёзд.»','Дедушка: «Лунный хлеб тоже нужно печь с душой.»'],['Путешественник: «Через галактику я шёл именно за этими булочками!»','Дедушка: «Звёзды далеко, а добрый рецепт рядом.»']][Math.max(0,Math.min(5,si))];if(Math.random()>.22)return;const line=lines[Math.floor(Math.random()*lines.length)],isGrand=line.startsWith('Дедушка:'),e=$('visitor');if(!e)return;e.innerHTML=(isGrand?`<span class="grandpa-mark">${GRANDPA_ICON}</span>`:'<span class="visitor-mark">🧑‍🍳</span>')+`<span>${line}</span>`;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),5600)};
  // Loading art stays briefly, but never waits indefinitely for a platform SDK.
  let loadingDone=false,loadingTimer=0,loadingStart=performance.now();
- function finishLoading(force=false){if(loadingDone&&!force)return;loadingDone=true;if(loadingTimer){clearTimeout(loadingTimer);loadingTimer=0}const delay=force?0:Math.max(0,7000-(performance.now()-loadingStart));loadingTimer=setTimeout(async()=>{await window.bakeryLanguageReady;const e=$('loading-screen');if(!e)return;document.documentElement.classList.add('app-ready');try{ysdk?.features?.LoadingAPI?.ready()}catch(_){}e.classList.add('hide');setTimeout(()=>e.remove(),500)},delay)}
+ function finishLoading(force=false){if(loadingDone&&!force)return;loadingDone=true;if(loadingTimer){clearTimeout(loadingTimer);loadingTimer=0}const delay=force?0:Math.max(0,350-(performance.now()-loadingStart));loadingTimer=setTimeout(async()=>{await window.bakeryLanguageReady;const e=$('loading-screen');if(!e)return;document.documentElement.classList.add('app-ready');document.dispatchEvent(new Event('bakery:game-ready'));performance.mark('bakery-ready');try{ysdk?.features?.LoadingAPI?.ready()}catch(_){}e.classList.add('hide');setTimeout(()=>e.remove(),500)},delay)}
  const skip=document.querySelector('.loading-skip');if(skip)skip.onclick=()=>finishLoading(true);
  window.finishLoading=finishLoading;window.addEventListener('load',()=>finishLoading(false),{once:true});setTimeout(()=>finishLoading(false),1900);
  setInterval(updateSaveStatus,1000);

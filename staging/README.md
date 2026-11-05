@@ -80,3 +80,13 @@ Stale diagnostic root cause: it fetched GET once before initial PUT and retained
 Real HTTP suite tests/staging-http.ps1 passes anonymous GET/PUT, forged auth, foreign origin, disabled webhook/invoice and staging endpoint isolation. Use it instead of unstable Node fetch HTTP checks; no auth bypass. Existing remote D1 SQL checks also passed with temporary qa rows removed. User row was read only.
 
 Release remains gated on real two-device restoration/conflict/offline tests, current production export/schema compatibility and production backup before separately approved release. Client economy remains editable; no trusted paid balance or leaderboard enabled by this work. Bot metadata instructions and release/rollback sequence remain in BOT_SETUP.md and this file.
+
+## Loading and synchronization follow-up
+
+Measured Edge cold/warm DOMContentLoaded before: staging 2000/608 ms, production 1297/110 ms. After: staging 1477/336 ms. A second production cold run varied to 5202 ms, warm 107 ms: network variation prevents attributing these differences solely to code. HTML is ~1.79 MB source/~1.04 MB encoded; embedded art unchanged. SDK measured 1425 ms in first cold staging run, 331 ms in later run. This is desktop Edge, not Android WebView or Telegram native splash measurement.
+
+Confirmed code delays: loading overlay enforces 7000 ms minimum; Telegram.ready called by adapter at DOMContentLoaded. Now ready is signaled immediately after SDK and loader minimum is 350 ms (6650 ms less artificial minimum). Game initialization and language await remain. No imagery removed or recompressed. Cloud modal previously could enter top layer while html:not(.app-ready) hid it, intercepting loading interactions. Defer cloud connect until bakery:game-ready; mobile-emulated regression test verifies skip, visible subsequent choice and intact progress. Unmodified production was read only.
+
+Cloud copy simplified, mobile status text enlarged. Identical snapshots continue automatically; unchanged acknowledged remote still continues local. Actual mismatches require choice with local backup. Online event retries pending snapshot immediately; stale revision still yields 409 and pauses writes, never merges balances. Status after PUT only follows successful server confirmation. Diagnostic panel remains staging build only.
+
+Six Node tests and both Edge browser tests passed, plus real PowerShell staging HTTP checks. Real Android native splash timing, true simultaneous two-device changes and device offline restoration after these changes still need one final owner run. Older cloud metadata does not establish a conflict by itself. No user rows edited or deleted.
