@@ -3,7 +3,7 @@ import path from 'node:path';
 const root = path.resolve(import.meta.dirname,'..');
 const dir = import.meta.dirname;
 const origin = 'https://bakery-empire-staging.miloserdovfeed.workers.dev';
-let worker = fs.readFileSync(path.join(root,'server/worker.mjs'),'utf8');
+let worker = fs.readFileSync(path.join(root,'server/worker.mjs'),'utf8').replaceAll('\r\n','\n');
 worker = worker.replace('https://milyygg.github.io',origin);
 const start = worker.indexOf('async function authenticate(');
 const end = worker.indexOf('async function handleSave(',start);
@@ -42,6 +42,7 @@ for (const file of ['index.html','tg-adapter.js','tg-leaderboard.js','cloud-save
   // Never touch Telegram CloudStorage shared with the live game.
   if (file === 'tg-adapter.js') s = s.replace('return isTG && tg.CloudStorage ? tg.CloudStorage : null;', 'return null;');
   if (file === 'index.html') s = s.replace('<head>','<head>\n<meta name="robots" content="noindex,nofollow">').replace('<body>', '<body><div style="position:fixed;top:0;left:0;z-index:99999;background:#a30;color:white;padding:4px">STAGING - отдельные тестовые сохранения</div>');
+  if(file === 'index.html') s=s.replace('</body>', '<script>addEventListener("DOMContentLoaded",()=>{const d=document.createElement("div");d.style.cssText="position:fixed;top:40px;left:8px;z-index:100001;background:white;color:black;padding:8px";d.textContent="STAGING Telegram ID: "+(window.Telegram?.WebApp?.initDataUnsafe?.user?.id || "откройте через Telegram");d.onclick=()=>d.remove();document.body.append(d)});</script></body>');
   fs.writeFileSync(path.join(dir,'public',file),s);
 }
 console.log('Staging built; no production files changed.');
