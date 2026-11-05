@@ -1,5 +1,5 @@
 (function(){
-const box=document.createElement('div');box.style.cssText='position:fixed!important;top:78px!important;left:8px!important;z-index:2147483646!important;background:white!important;color:black!important;padding:10px!important;font:14px sans-serif!important;max-width:90vw!important';document.body.append(box);
+const panel=document.createElement('details');const title=document.createElement('summary');title.textContent='STAGING';panel.append(title);const box=document.createElement('div');panel.append(box);panel.style.cssText='position:fixed;bottom:8px;left:8px;z-index:2147483646;background:#fff;color:#222;max-width:85vw;padding:6px;font:12px sans-serif';document.body.append(panel);box.style.cssText='padding:8px;max-width:320px;overflow-wrap:anywhere';
 const tg=window.Telegram&&Telegram.WebApp;
 let auth='ожидание';
 function draw(){box.textContent='STAGING: Telegram '+(tg&&tg.initData?'данные есть':'нет данных запуска')+'; API: '+auth+'; облако: '+(window.BAKERY_CLOUD&&BAKERY_CLOUD.status?BAKERY_CLOUD.status():'модуль не запущен');}

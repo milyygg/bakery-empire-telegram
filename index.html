@@ -2923,7 +2923,7 @@ function pay(r){if(window.v26Pay)return window.v26Pay(r);toast('Магазин �
 const pr=s=>s.id=='off'?10+5*S.offLv:s.p;
 function gemBuy(id){const s=SHOP.find(x=>x.id==id);if(s.skin&&S.shop[id]){S.skin=S.skin==s.skin?'':s.skin;return tab('shop',1)}const p=pr(s);if((s.once&&S.shop[id])||S.gems<p||(id=='off'&&S.offLv>=60))return sfx('no');S.gems-=p;sfx('buy');if(s.once)S.shop[id]=1;if(id=='hands'||id=='recipe'){S.tb[id]=now()+3e5;confetti(12)}if(id=='time')earn(base()*7200);if(id=='off')S.offLv++;if(id=='gold')spawnGold();if(s.skin)S.skin=s.skin;tab('shop',1)}
 function claim(t,L){const K=t=='F'?S.cF:S.cP;if(K[L]||S.bp<L*LVL||(t=='P'&&!S.prem))return;K[L]=1;S.gems+=t=='F'?FR(L):PR(L);sfx('buy');confetti(10);save();tab('pass',1)}
-const DAY_MS=864e5,dayKey=t=>Math.floor(Math.max(0,Number(t)||0)/DAY_MS),dElapsed=()=>Math.max(0,now()-Math.max(0,Number(S.dr&&S.dr.last)||0)),dAvail=()=>!S.dr||!Number(S.dr.last)||dElapsed()>=DAY_MS,dNext=()=>{const elapsed=dElapsed();return S.dr&&Number(S.dr.s)>0&&elapsed<2*DAY_MS?Number(S.dr.s)%7+1:1},dWait=()=>dAvail()?0:Math.max(0,DAY_MS-dElapsed()),dCoin=n=>Math.floor(base()*DRW[n-1][1]*600+100*n);
+const DAY_MS=864e5,dayKey=t=>Math.floor(Math.max(0,Number(t)||0)/DAY_MS),dElapsed=()=>Math.max(0,now()-Math.max(0,Number(S.dr&&S.dr.last)||0)),dAvail=()=>!S.dr||!Number(S.dr.last)||dElapsed()>=DAY_MS,dNext=()=>{const elapsed=dElapsed();return S.dr&&Number(S.dr.s)>0&&elapsed<2*DAY_MS?Number(S.dr.s)%7+1:1},dWait=()=>dAvail()?0:Math.max(0,DAY_MS-dElapsed()),dCoin=n=>Math.min([100,150,250,400,600,900,1500][n-1],Math.floor(Math.max(0,base())*60+50*n));
 function dClaim(){if(!dAvail())return;const n=dNext(),d=DRW[n-1],c=dCoin(n);S.dr.s=n;S.dr.last=now();S.gems+=Math.round(d[0]*(S.skills&&S.skills.goldenTray?1.15:1));earn(c);prog('dc');sfx('q');confetti(40);toast('День '+n+': +'+d[0]+' кристаллов и '+fmt(c)+' монет');tab('daily',1)}
 function qc(k,i){audio();const A=k=='d'?DQ():WQ(),P=k=='d'?S.dp:S.wp,C=k=='d'?S.dcl:S.wcl,q=A[i];if(!q||C[i]||(P[q[0]]||0)<q[2])return sfx('no');C[i]=1;S.gems+=q[3];S.bp+=10;save();sfx('q');confetti(20);toast('Награда получена: +'+q[3]+' 💎 · +10 очков пропуска');tab('tasks',1)}
 function roll(){const d=new Date(now()),season=Math.max(1,Number(S.bpSeason)||1),dk=season+'-'+d.getUTCFullYear()+'-'+d.getUTCMonth()+'-'+d.getUTCDate(),wk='season-'+season;if(S.dk!=dk){S.dk=dk;S.dp={};S.dcl={}}if(S.wk!=wk){S.wk=wk;S.wp={};S.wcl={}}}
@@ -3962,7 +3962,7 @@ setInterval(save,10000);addEventListener('beforeunload',save);document.addEventL
  }
  window.openBunSkinDetail=renderSkinDetail;
  window.buyBunSkin=function(index){
-  const i=Math.floor(number(index)),b=BUN_SKINS[i];if(!b||owned(i))return false;if(!isStorySkinOpen(i)){toast('Эта булочка ещё закрыта сюжетом');return false}const p=b.price;
+  const i=Math.floor(number(index)),b=BUN_SKINS[i];if(!b||owned(i))return false;if(!isStorySkinOpen(i)){toast('Эта булочка ещё закрыта сюжетом');return false}const p={coins:number(b.price.coins),gems:number(b.price.gems),yeast:number(b.price.yeast)};
   if(number(S.coins)<p.coins||number(S.gems)<p.gems||number(S.starter)<p.yeast){sfx('no');toast('Не хватает валюты для этой булочки');return false}
   S.coins-=p.coins;S.gems-=p.gems;S.starter-=p.yeast;S.bunSkinOwned[i]=1;S.bunSkinOrder.push(i);save();sfx('buy');confetti(12);ui();renderSkinDetail(i,window.__v22SkinDetail?.from||'shop');toast('Скин приобретён: '+b.name);return true;
  };
@@ -4856,5 +4856,8 @@ setInterval(save,10000);addEventListener('beforeunload',save);document.addEventL
 </script>
 <!-- Рейтинг пекарей (работает только если развёрнут воркер) -->
 <script src="./tg-leaderboard.js"></script>
-</body>
+<style id="header-safe-layout">
+body.quality-performance .bub,body.quality-performance .reward-orb,body.quality-performance #sheet,body.quality-performance #v30-modal{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+@media(max-width:800px){#stage{position:fixed!important;top:calc(140px + env(safe-area-inset-top))!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;max-width:calc(100vw - 40px)!important;width:max-content!important;font-size:clamp(12px,3.8vw,17px)!important;max-height:48px;overflow:hidden;padding:6px 14px!important}}
+</style></body>
 </html>

@@ -102,3 +102,15 @@ Loading screen informational minimum restored to 3 seconds, optional Skip bypass
 Price inversion caused by story order 0,1,3,2 while index prices were 0,250,1200,6000. Swapped only prices for IDs 2/3: display order now 0,250,1200,6000,30000 and unchanged remainder. Purchase ownership IDs and bonuses unchanged; existing purchases retained. Full story-order monotonicity test passes.
 
 Wood/brass location sign and aligned crystal inline flex counter added; mobile screenshot inspected at 390x844. No image assets changed. Historical crystal-loss cause and actual Android performance are unresolved validation limitations, not claimed fixes. Seven Node tests, loading browser, actual economy browser and mocked cloud browser pass; live staging HTTP passes. Production/main/webhook untouched.
+
+## P0 purchase and cloud-first follow-up
+
+Exact crystal bug reproduced: coin-only skin prices omit gems/yeast; subtraction of undefined produces NaN. Existing normalizers turn NaN crystals into zero; JSON can encode nonfinite fields as null. Purchase now normalizes each missing price component to zero before affordability check and subtraction. No balance restoration or user-row edits. Test buys IDs 1 and 3 successively with 30 gems and 7 starter, verifies both preserved and 30 gems after reload. Other explicit crystal shop subtraction uses numeric pr(item).
+
+Cloud-first: first launch loads server automatically on fresh device or when persisted local state matches last server acknowledgment (last/playMs ignored). Dirty local state with unknown/new remote revision requires choice; unchanged remote baseline can accept pending local state. Initial-only fresh-device shortcut is never reused on later conflict, regression covered. No currency merge. Both local and remote backups retained before replacement. Online retries a failed initial connection as well as queued writes.
+
+Staging diagnostics moved to closed details panel; removed duplicate fixed identity strip. Header sign below counters at <=800px. Layout measurements exercised widths 320,360,390,430,768,1280 and resizing; header-layout script records geometry, not all-element overlap certification. User custom name persistence is not added; existing sign is the game's location label.
+
+Daily reward previous formula is current base income * 600 * day multiplier + 100*day, explaining large rewards on progressed saves. New coin bonus is 60 seconds of base plus 50*day, capped at [100,150,250,400,600,900,1500]; fresh day 1 = 50. Existing crystal schedule, claimed timestamps and purchased ownership remain. Server daily entitlement not implemented: client clock/state manipulation remains possible. Not a trusted financial economy.
+
+Low quality now also overrides later backdrop blur rules for floating rewards/sheet/modal; graphics unchanged. Real Android GPU/WebView inaccessible, so severe Android FPS is unresolved, not declared fixed. Eight Node cases plus three browser suites passed (including fresh second-device cloud restore, spent crystals, offline retry). Real staging HTTP protection suite passes; no signature bypass. Owner's existing D1 row read only.
