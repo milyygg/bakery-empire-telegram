@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
+test('daily coin bonus bounded at current income, no retroactive state migration',()=>{const s=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');const expression=s.match(/dCoin=n=>([^;\r\n]+)/)[1];const high=vm.runInNewContext('n=>'+expression,{base:()=>1e6});const fresh=vm.runInNewContext('n=>'+expression,{base:()=>0});assert.deepEqual(Array.from({length:7},(_,i)=>high(i+1)),[100,150,250,400,600,900,1500]);assert.equal(fresh(1),50);});

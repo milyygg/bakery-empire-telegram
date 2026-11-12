@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><!-- Telegram Mini App: SDK и адаптер подключаются ниже. --><!-- Telegram Mini Apps SDK -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>try{window.Telegram?.WebApp?.ready();performance.mark("telegram-ready")}catch(e){}</script>
 <!-- Настройки платформы (читает tg-adapter.js) -->
 <script>
 window.BAKERY_TG_CONFIG = {
@@ -14,6 +15,7 @@ window.BAKERY_TG_CONFIG = {
 <!-- Адаптер Telegram: WebView, облачные сейвы, тактильный отклик.
      Подключается в <head>, чтобы ядро игры сразу увидело window.BAKERY_CLOUD -->
 <script src="./tg-adapter.js"></script>
+<script src="./cloud-saves.js"></script>
 <title>Булочная империя</title>
 <!-- HANDOFF (для другой нейросети): HTML-кликер про пекарню, один файл. Сборка под Telegram Mini Apps (build.py). Баланс в блоке "ДАННЫЕ". Валюты: монеты, кристаллы 💎. Есть: квесты-сюжет Q, достижения ACH, пропуск (free/premium), магазин SHOP/REAL, закваска (престиж, после квеста 8), SVG-фоны по стадиям (bgsvg), автосохранение localStorage 'bakery_v2' + Telegram CloudStorage (чанки по 4096 символов) + свой бэкенд на Cloudflare Workers. Оплата — Telegram Stars (XTR) через /api/invoice воркера. -->
 
@@ -188,8 +190,8 @@ body{background:#171015}
 @keyframes aura{to{transform:translate(-50%,-48%) scale(1.08);opacity:.75}}
 .crumb{position:fixed;z-index:12;pointer-events:none;font-size:12px;animation:crumb .7s ease-out forwards}
 @keyframes crumb{to{transform:translate(var(--dx),var(--dy)) rotate(220deg) scale(.4);opacity:0}}
-.ripple{position:fixed;z-index:11;pointer-events:none;width:22px;height:22px;border:3px solid #ffe19a;border-radius:50%;transform:translate(-50%,-50%);animation:ripple .55s ease-out forwards;box-shadow:0 0 15px #ffd16688}
-@keyframes ripple{to{width:150px;height:150px;opacity:0;border-width:1px}}
+.ripple{position:fixed;z-index:11;pointer-events:none;width:150px;height:150px;border:2px solid #ffe19a;border-radius:50%;transform:translate(-50%,-50%);animation:ripple .55s ease-out forwards;box-shadow:0 0 15px #ffd16688}
+@keyframes ripple{from{transform:translate(-50%,-50%) scale(.147)}to{transform:translate(-50%,-50%) scale(1);opacity:0}}
 #statusline{position:fixed;left:50%;top:calc(50% + min(30vw,160px));transform:translateX(-50%);z-index:3;pointer-events:none;white-space:nowrap;background:#160d18a8;border:1px solid #ffffff22;border-radius:20px;padding:5px 11px;font-size:11px;color:#f6d9c2;backdrop-filter:blur(7px);box-shadow:0 4px 18px #0005}
 #scene-dust{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden}
 .dust{position:absolute;width:4px;height:4px;border-radius:50%;background:#fff0bd88;box-shadow:0 0 7px #ffe1a866;animation:dust linear infinite}
@@ -1782,7 +1784,7 @@ body.combo-1000 #center{animation:none!important}}
 #bun{position:absolute!important;left:50%!important;top:50%!important;z-index:2!important;
  width:74%!important;height:74%!important;display:flex!important;align-items:center!important;justify-content:center!important;
  overflow:visible!important;font-size:0!important;filter:none!important;
- transform:translate(-50%,-50%) translate3d(var(--bun-inner-x,0px),var(--bun-inner-y,0px),0)!important;
+ transform:translate(-50%,-50%) var(--bun-offset,translate3d(0,0,0))!important;
  transform-origin:center!important;will-change:transform!important;transition:none!important
 }
 #bun .pastry-hero{display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;
@@ -2678,7 +2680,11 @@ html,body{width:100vw!important;height:100dvh!important;min-height:100dvh!import
   background:linear-gradient(135deg,#1b1018cc,#2a1a2ecc)!important;
   border:1px solid #ffd16644!important;box-shadow:0 4px 14px #0007!important;
   white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}}</style>
-</head><body>
+<style id="stability-polish">
+#gems{display:inline-flex!important;align-items:center!important;justify-content:center;gap:6px;white-space:nowrap;line-height:1.2!important;font-variant-numeric:tabular-nums}
+#gems .gm{display:inline-flex!important;align-items:center;justify-content:center;width:1.2em;height:1.2em;font-size:1em!important;line-height:1!important;vertical-align:middle;transform:none!important}
+#stage{box-sizing:border-box;max-width:min(72vw,520px)!important;margin-inline:auto;padding:7px 18px!important;border:2px solid #c49a50!important;border-radius:9px;background:linear-gradient(#674228,#3b2419)!important;color:#ffe4a3!important;box-shadow:inset 0 0 0 2px #362014;font-family:Georgia,serif!important;line-height:1.2!important;text-align:center;overflow-wrap:anywhere;white-space:normal!important;filter:none!important;text-shadow:0 1px #28180e}
+</style></head><body>
 <div id="loading-screen" aria-label="Загрузка Булочной империи"><div class="loading-card"><div class="loading-bakery" aria-hidden="true"><svg viewBox="0 0 260 170"><defs><linearGradient id="loadwall" x2="0" y2="1"><stop stop-color="#f6cf91"/><stop offset="1" stop-color="#a85d35"/></linearGradient><radialGradient id="loadfire"><stop stop-color="#fff9c6"/><stop offset=".45" stop-color="#ffc341"/><stop offset="1" stop-color="#f45124"/></radialGradient></defs><path d="M18 154V43Q20 22 43 22H217Q240 22 242 43V154Z" fill="url(#loadwall)" stroke="#65341f" stroke-width="6"/><path d="M52 74Q52 39 130 39Q208 39 208 74V104H52Z" fill="#9b5c36" stroke="#fff0bd" stroke-width="5"/><path d="M62 73Q62 50 130 50Q198 50 198 73V97H62Z" fill="#a8ddeb"/><path d="M130 50V97M62 77H198" stroke="#754329" stroke-width="5"/><path d="M27 112H233V128H27Z" fill="#704028"/><path d="M37 128H223V154H37Z" fill="#d38a4d" stroke="#63331e" stroke-width="4"/><rect x="89" y="104" width="83" height="49" rx="12" fill="#d87943" stroke="#582c1d" stroke-width="5"/><path d="M103 135Q103 114 130 114Q157 114 157 135Z" fill="#341e1a"/><path d="M119 135Q121 121 130 118Q138 125 140 135Z" fill="url(#loadfire)" class="loading-flame"/><path d="M120 105Q110 93 120 83M138 104Q148 91 138 79" fill="none" stroke="#fff5d9" stroke-width="4" stroke-linecap="round" class="loading-steam"/><path d="M105 99Q109 79 130 81Q150 80 155 99Q148 107 130 104Q113 107 105 99Z" fill="#e7a24f" stroke="#965123" stroke-width="3" class="loading-loaf"/><path d="M119 91q5 5 10 0M134 89q5 5 10 0" fill="none" stroke="#fff1bb" stroke-width="3" stroke-linecap="round"/></svg></div><div class="loading-title">Булочная империя</div><div class="loading-caption">Загрузка<span class="loading-dots">…</span></div><div class="loading-track"><i></i></div><p>Пусть в твоей пекарне всегда пахнет свежим хлебом и хорошими новостями!</p><small>Создатель: <b>milyy_gg</b></small><button type="button" class="loading-skip" onclick="finishLoading(true)">Пропустить</button></div></div>
 <div id="bg"></div>
 <svg width="0" height="0" style="position:absolute"><defs><linearGradient id="gg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#ff9a3d"/></linearGradient><linearGradient id="gp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd0e4"/><stop offset="1" stop-color="#ff5fa0"/></linearGradient><radialGradient id="cr" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#ffd98a"/><stop offset=".55" stop-color="#e09a45"/><stop offset="1" stop-color="#a95a1c"/></radialGradient><linearGradient id="pk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffc2dc"/><stop offset="1" stop-color="#f27aa8"/></linearGradient><linearGradient id="cm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2cf"/><stop offset="1" stop-color="#e8b878"/></linearGradient></defs></svg>
@@ -2769,11 +2775,8 @@ window.bakerySdkReady=Promise.resolve(null);
 try{(function(){
   var C=window.BAKERY_CLOUD;if(!C||!C.available())return;
   player=C.makePlayer();
-  C.loadSave().then(function(d){
-    if(d&&d.S&&((d.S.total||0)>S.total||!localSaveFound||(Number(d.S.last)||0)>(Number(S.last)||0))){
-      S=Object.assign(fresh(),d.S);buildUps(1);try{roll()}catch(_){}try{ui()}catch(_){}try{save()}catch(_){}
-    }
-  }).catch(function(){});
+  const connectCloud=()=>C.connect({read:function(){return S},hasLocal:localSaveFound,apply:function(data){S=Object.assign(fresh(),data);buildUps(1);try{roll();ui()}catch(_){}},backup:function(){localStorage.setItem('bakery_before_cloud_'+Date.now(),JSON.stringify(S))}});
+  if(document.documentElement.classList.contains('app-ready'))connectCloud();else document.addEventListener('bakery:game-ready',connectCloud,{once:true});
 })()}catch(e){}
 function save(){S.last=now();try{localStorage.setItem('bakery_v2',JSON.stringify(S))}catch(e){}if(player&&now()-lastCloud>30000){lastCloud=now();player.setData({S}).catch(()=>{})}}
 const $=id=>document.getElementById(id);
@@ -2920,7 +2923,7 @@ function pay(r){if(window.v26Pay)return window.v26Pay(r);toast('Магазин �
 const pr=s=>s.id=='off'?10+5*S.offLv:s.p;
 function gemBuy(id){const s=SHOP.find(x=>x.id==id);if(s.skin&&S.shop[id]){S.skin=S.skin==s.skin?'':s.skin;return tab('shop',1)}const p=pr(s);if((s.once&&S.shop[id])||S.gems<p||(id=='off'&&S.offLv>=60))return sfx('no');S.gems-=p;sfx('buy');if(s.once)S.shop[id]=1;if(id=='hands'||id=='recipe'){S.tb[id]=now()+3e5;confetti(12)}if(id=='time')earn(base()*7200);if(id=='off')S.offLv++;if(id=='gold')spawnGold();if(s.skin)S.skin=s.skin;tab('shop',1)}
 function claim(t,L){const K=t=='F'?S.cF:S.cP;if(K[L]||S.bp<L*LVL||(t=='P'&&!S.prem))return;K[L]=1;S.gems+=t=='F'?FR(L):PR(L);sfx('buy');confetti(10);save();tab('pass',1)}
-const DAY_MS=864e5,dayKey=t=>Math.floor(Math.max(0,Number(t)||0)/DAY_MS),dElapsed=()=>Math.max(0,now()-Math.max(0,Number(S.dr&&S.dr.last)||0)),dAvail=()=>!S.dr||!Number(S.dr.last)||dElapsed()>=DAY_MS,dNext=()=>{const elapsed=dElapsed();return S.dr&&Number(S.dr.s)>0&&elapsed<2*DAY_MS?Number(S.dr.s)%7+1:1},dWait=()=>dAvail()?0:Math.max(0,DAY_MS-dElapsed()),dCoin=n=>Math.floor(base()*DRW[n-1][1]*600+100*n);
+const DAY_MS=864e5,dayKey=t=>Math.floor(Math.max(0,Number(t)||0)/DAY_MS),dElapsed=()=>Math.max(0,now()-Math.max(0,Number(S.dr&&S.dr.last)||0)),dAvail=()=>!S.dr||!Number(S.dr.last)||dElapsed()>=DAY_MS,dNext=()=>{const elapsed=dElapsed();return S.dr&&Number(S.dr.s)>0&&elapsed<2*DAY_MS?Number(S.dr.s)%7+1:1},dWait=()=>dAvail()?0:Math.max(0,DAY_MS-dElapsed()),dCoin=n=>Math.min([100,150,250,400,600,900,1500][n-1],Math.floor(Math.max(0,base())*60+50*n));
 function dClaim(){if(!dAvail())return;const n=dNext(),d=DRW[n-1],c=dCoin(n);S.dr.s=n;S.dr.last=now();S.gems+=Math.round(d[0]*(S.skills&&S.skills.goldenTray?1.15:1));earn(c);prog('dc');sfx('q');confetti(40);toast('День '+n+': +'+d[0]+' кристаллов и '+fmt(c)+' монет');tab('daily',1)}
 function qc(k,i){audio();const A=k=='d'?DQ():WQ(),P=k=='d'?S.dp:S.wp,C=k=='d'?S.dcl:S.wcl,q=A[i];if(!q||C[i]||(P[q[0]]||0)<q[2])return sfx('no');C[i]=1;S.gems+=q[3];S.bp+=10;save();sfx('q');confetti(20);toast('Награда получена: +'+q[3]+' 💎 · +10 очков пропуска');tab('tasks',1)}
 function roll(){const d=new Date(now()),season=Math.max(1,Number(S.bpSeason)||1),dk=season+'-'+d.getUTCFullYear()+'-'+d.getUTCMonth()+'-'+d.getUTCDate(),wk='season-'+season;if(S.dk!=dk){S.dk=dk;S.dp={};S.dcl={}}if(S.wk!=wk){S.wk=wk;S.wp={};S.wcl={}}}
@@ -2957,11 +2960,30 @@ function spawnGold(){
 // ===== ВИЗУАЛЬНЫЙ СЛОЙ / GAME FEEL =====
 const recipeNames=['Круассан','Багет','Хлеб','Крендель','Кекс','Торт','Кусочек торта','Пончик','Пирог','Бейгл','Печенье','Золотая звезда'];
 const recipeRarity=['Обычная','Обычная','Обычная','Необычная','Необычная','Редкая','Редкая','Редкая','Эпическая','Эпическая','Легендарная','Мифическая'];
-function hitFX(x,y){if(S.quality==='performance')return;const r=document.createElement('div');r.className='ripple';r.style.left=x+'px';r.style.top=y+'px';document.body.appendChild(r);setTimeout(()=>r.remove(),650);const icons=['✦','•','✧','🍞'];for(let i=0;i<4;i++){const c=document.createElement('div');c.className='crumb';c.textContent=icons[i];c.style.left=x+(Math.random()*28-14)+'px';c.style.top=y+(Math.random()*20-10)+'px';c.style.setProperty('--dx',(Math.random()*100-50)+'px');c.style.setProperty('--dy',(-35-Math.random()*45)+'px');document.body.appendChild(c);setTimeout(()=>c.remove(),800)}}
+const idleBursts = [], activeBursts = new Set();
+function makeBurst(){
+ const group=document.createElement('div');group.style.display='contents';
+ for(const [index,icon] of ['', '✦','•','✧','🍞'].entries()){
+  const part=document.createElement('div');part.className=index?'crumb':'ripple';part.textContent=icon;group.append(part);
+ }
+ return group;
+}
+function hitFX(x,y){
+ if(S.quality==='performance')return;
+ const group=idleBursts.pop()||makeBurst();
+ for(const part of group.children){
+  const crumb=part.className==='crumb';part.style.left=(x+(crumb?Math.random()*28-14:0))+'px';part.style.top=(y+(crumb?Math.random()*20-10:0))+'px';
+  if(crumb){part.style.setProperty('--dx',(Math.random()*100-50)+'px');part.style.setProperty('--dy',(-35-Math.random()*45)+'px')}
+ }
+ document.body.append(group);activeBursts.add(group);
+ function recycle(){group.remove();activeBursts.delete(group);clearTimeout(group.burstTimer);if(idleBursts.length<12)idleBursts.push(group)}
+ group.recycle=recycle;group.burstTimer=setTimeout(recycle,800);
+ if(activeBursts.size>12)activeBursts.values().next().value.recycle();
+}
 function bakeryDust(){const box=$('scene-dust'),mobile=window.matchMedia&&window.matchMedia('(max-width:600px)').matches,want=mobile?0:(S.quality==='performance'?3:18);if(box.childElementCount===want)return;box.innerHTML='';for(let i=0;i<want;i++){const d=document.createElement('i');d.className='dust';d.style.left=Math.random()*100+'%';d.style.animationDelay=(-Math.random()*12)+'s';d.style.animationDuration=(9+Math.random()*10)+'s';d.style.setProperty('--x',(Math.random()*120-60)+'px');box.appendChild(d)}}
 bakeryDust();setTimeout(visitor,90000);setInterval(()=>{if(Math.random()<.85)visitor()},240000+Math.random()*120000);
 function productionStrip(){const el=$('production-strip');if(!el)return;let list=BUILD.map((b,i)=>({b,i,l:S.own[i]})).filter(x=>x.l>0).slice(0,5);if(!list.length)list=[{b:BUILD[0],i:0,l:0}];const html=list.map((x,n)=>`<div class="prod" title="${x.b.n}"><span class="pi">${x.b.i}</span><small>${x.l?fmt(x.l):'—'}</small></div>`).join('');if(el.dataset.h!==html){el.dataset.h=html;el.innerHTML=html}}
-function visitor(){const msgs=[['👴','Дедушка: «Запах выпечки — лучше любой рекламы!»'],['👴','Дедушка: «Не забывай улучшать печь, внучок.»'],['👴','Дедушка: «Сегодня в лавке особенно уютно.»'],['🧑‍🍳','Покупатель: «Ух ты, какая свежая булочка!»']];const el=$('visitor');if(!el)return;const [who,text]=msgs[Math.floor(Math.random()*msgs.length)];const mark=who==='👴'?`<span class="grandpa-mark">${GRANDPA_ICON}</span>`:`<span class="visitor-mark">${who}</span>`;el.innerHTML=mark+`<span>${text}</span>`;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),7000)}
+function visitor(){const msgs=[['👴','Дедушка: «Запах выпечки — лучше любой рекламы!»'],['👴','Дедушка: «Не забывай улучшать печь, внучок.»'],['👴','Дедушка: «Сегодня в лавке особенно уютно.»'],['🧑','Покупатель: «Ух ты, какая свежая булочка!»']];const el=$('visitor');if(!el)return;const [who,text]=msgs[Math.floor(Math.random()*msgs.length)];const mark=who==='👴'?`<span class="grandpa-mark">${GRANDPA_ICON}</span>`:`<span class="visitor-mark">${who}</span>`;el.innerHTML=mark+`<span>${text}</span>`;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),7000)}
 function bakeryStatus(){productionStrip();const total=S.own.reduce((a,b)=>a+b,0),names=total<3?'Печь разогревается · свежая выпечка уже в пути':total<15?'Пекари работают · витрина наполняется':total<40?'Пекарня работает на полную мощность':total<100?'Город уже знает вашу выпечку':'Империя выпекает без остановки',node=$('statusline'),text='✨ '+names;if(node.textContent!==text)node.textContent=text}
 function recipeBook(){let h='<div class="notice">📖 Коллекция рецептов. Новые булочки открываются по мере продвижения сюжета. Собери всю витрину!</div><div class="collection-grid">',lockAdded=false;PASTRY_NAMES.forEach((name,i)=>{const open=i<unlockedPastryCount();let art='';if(open)art=`<img class="pastry-recipe-img" alt="${name}" src="${PASTRY_DATA[i]}">`;else if(!lockAdded){art='<span class="recipe-lock" role="img" aria-label="Рецепт пока закрыт">🔒</span>';lockAdded=true}else art='<span class="recipe-unknown" aria-hidden="true">···</span>';h+=`<div class="recipe-card ${open?'open':'lock'}"><div class="recipe-img">${art}</div><div class="rn">${name}</div><div class="rr">${open?'Открыт рецепт':'Открывается позже'}</div></div>`});return h+'</div>'}
 function achievementBook(){return '<div class="notice">🏆 Достижения дают очки пекарского пропуска. Здесь видно не только награду, но и путь до неё.</div><div class="achievement-grid">'+ACH.map((a,i)=>`<div class="achievement ${S.ach[i]?'done':''}"><div class="ai">${S.ach[i]?'🏆':'🔒'}</div><div><div class="an">${a.n}</div><div class="ad">${S.ach[i]?'Выполнено · +'+ACHPTS+' очков':'Ещё впереди'}</div></div></div>`).join('')+'</div>'}
@@ -3006,11 +3028,12 @@ function updateWorldClock(){const d=new Date();const h=d.getHours()%12,m=d.getMi
 setInterval(updateWorldClock,1000);updateWorldClock();setInterval(()=>decorateScene(stg()),90000+Math.random()*60000);
 
 let dotK='';
-function decorateScene(si){const v=$('visitor');if(!v)return;const p=[['👴','Дедушка','Печь работает? Тогда всё идёт по плану!'],['👴','Дедушка','Запах свежего хлеба — вот что я люблю.'],['🧑‍🍳','Пекарь','Заказы растут! Не сбавляем темп.'],['👴','Дедушка','Какая пекарня! Я тобой горжусь.'],['👴','Дедушка','Даже на Луне булочки должны быть тёплыми.'],['👴','Дедушка','Звёзды далеко, а рецепт всё тот же.']][si];if(Math.random()<.85){const mark=p[0]==='👴'?`<span class="grandpa-mark">${GRANDPA_ICON}</span>`:`<span class="visitor-mark">${p[0]}</span>`;v.innerHTML=`${mark} <span><b>${p[1]}:</b> ${p[2]}</span>`;v.classList.add('show');setTimeout(()=>v.classList.remove('show'),5200)}}
-function ui(){const coinHTML='<span class="cn"></span>'+fmt(Math.floor(S.coins)),coinNode=$('coins');if(coinNode.innerHTML!==coinHTML)coinNode.innerHTML=coinHTML;const gemHTML=ic('💎 '+S.gems),gemNode=$('gems');if(gemNode.innerHTML!==gemHTML)gemNode.innerHTML=gemHTML;const cpsText=fmt(cps())+' в секунду · клик +'+fmt(clickVal()),cpsNode=$('cps');if(cpsNode.textContent!==cpsText)cpsNode.textContent=cpsText;
+function decorateScene(si){const v=$('visitor');if(!v)return;const p=[['👴','Дедушка','Печь работает? Тогда всё идёт по плану!'],['👴','Дедушка','Запах свежего хлеба — вот что я люблю.'],['🧑','Пекарь','Заказы растут! Не сбавляем темп.'],['👴','Дедушка','Какая пекарня! Я тобой горжусь.'],['👴','Дедушка','Даже на Луне булочки должны быть тёплыми.'],['👴','Дедушка','Звёзды далеко, а рецепт всё тот же.']][si];if(Math.random()<.85){const mark=p[0]==='👴'?`<span class="grandpa-mark">${GRANDPA_ICON}</span>`:`<span class="visitor-mark">${p[0]}</span>`;v.innerHTML=`${mark} <span><b>${p[1]}:</b> ${p[2]}</span>`;v.classList.add('show');setTimeout(()=>v.classList.remove('show'),5200)}}
+function setStableText(node,text){text=String(text);if(node.textContent!==text)node.textContent=text}
+function ui(){const coinHTML='<span class="cn"></span>'+fmt(Math.floor(S.coins)),coinNode=$('coins');if(coinNode.innerHTML!==coinHTML)coinNode.innerHTML=coinHTML;const gemHTML='<span class="gm" aria-hidden="true">💎</span> '+fmt(Math.max(0,Math.floor(Number(S.gems)||0))),gemNode=$('gems');if(gemNode.innerHTML!==gemHTML)gemNode.innerHTML=gemHTML;const cpsText=fmt(cps())+' в секунду · клик +'+fmt(clickVal()),cpsNode=$('cps');if(cpsNode.textContent!==cpsText)cpsNode.textContent=cpsText;
 const lightTier=lightCount();if(curLightTier!==lightTier){curLightTier=lightTier;curBg=-1}const artProgress=Math.max(0,Math.min(12,Number(S.q)||0));if(curArtProgress!==artProgress){curArtProgress=artProgress;curBg=-1}const si=stg(),wm=worldMode(),td=new Date(),timeMinute=td.getHours()*60+td.getMinutes();if(curBg!=si||curTimeMode!=wm||curTimeMinute!=timeMinute){curBg=si;curTimeMode=wm;curTimeMinute=timeMinute;const b=$('bg');b.innerHTML=bgsvg(si,wm);b.style.opacity=1;if(curBg===si)decorateScene(si)}
 const stageNode=$('stage'),stageText=(STAGES[si]&&STAGES[si][1])||STAGES[0][1];if(stageNode.dataset.stageName!==stageText){stageNode.dataset.stageName=stageText;stageNode.textContent=stageText}const clockNode=$('world-clock'),clockFilter=si>=4?'drop-shadow(0 7px 12px #0007) saturate(1.25) drop-shadow(0 0 12px #58eaff55)':'drop-shadow(0 7px 12px #0007)';if(clockNode.dataset.v18Filter!==clockFilter){clockNode.style.filter=clockFilter;clockNode.dataset.v18Filter=clockFilter}bakeryStatus();const bi=heroPastryIndex();if($('bun').dataset.i!=bi){$('bun').dataset.i=bi;$('bun').innerHTML=`<img class="pastry-hero" src="${PASTRY_DATA[bi]}" alt="${PASTRY_NAMES[bi]}" draggable="false">`}const body=document.body,__q=S.quality==='performance'?'quality-performance':'quality-high';if(body.dataset.v18Quality!==__q){body.classList.remove('quality-performance','quality-high');body.classList.add(__q);body.dataset.v18Quality=__q}const __sk=S.skin&&['sakura','honey','mint','lavender','starlight','neon'].includes(S.skin)?(S.skin==='neon'?'sk-neon':'skin-'+S.skin):'';if(body.dataset.v18Skin!==__sk){body.classList.remove('skin-sakura','skin-honey','skin-mint','skin-lavender','skin-starlight','sk-neon');if(__sk)body.classList.add(__sk);body.dataset.v18Skin=__sk}const __fc=clickCombo||0,__epic=__fc>=4000?'epic4000':__fc>=2000?'epic2000':__fc>=1000?'epic1000':__fc>=500?'epic500':'';if(body.dataset.v18Epic!==__epic){body.classList.remove('epic4000','epic2000','epic1000','epic500');if(__epic)body.classList.add(__epic);body.dataset.v18Epic=__epic}
-if(T=='build'){let readyCount=0;BUILD.forEach((b,i)=>{const d=brow[i],n=buyMode==='max'?affordableN(i):buyMode,total=n>0?costN(i,n):Infinity,ready=n>0&&S.coins>=total;d.classList.toggle('no',!ready);d.classList.toggle('ready',ready);d.querySelector('.pr').textContent='Следующий: '+fmt(cost(i))+' · '+fmt(b.p*bmult(i)*smult())+'/сек';d.querySelector('.build-cost').textContent=ready?'✓ ×'+n+' за '+fmt(total)+' монет':(n>0?'Нужно ещё '+fmt(Math.max(0,total-S.coins))+' монет':'Недостаточно даже на 1 уровень');d.querySelector('.cnt').textContent=S.own[i]+(ready?' → '+(S.own[i]+n):'');if(ready)readyCount++});const modes=[1,10,100,'max'];buyModes.querySelectorAll('.buy-mode').forEach((b,j)=>{const m=modes[j],ok=BUILD.some((_,i)=>{const n=m==='max'?affordableN(i):m;return n>0&&S.coins>=costN(i,n)});b.classList.toggle('disabled',!ok)});$('mode-summary').textContent=readyCount?'Доступно зданий для '+(buyMode==='max'?'MAX':('×'+buyMode))+': '+readyCount:'Нет зданий, которые можно купить в выбранном режиме';}
+if(T=='build'){let readyCount=0;BUILD.forEach((b,i)=>{const d=brow[i],n=buyMode==='max'?affordableN(i):buyMode,total=n>0?costN(i,n):Infinity,ready=n>0&&S.coins>=total;d.classList.toggle('no',!ready);d.classList.toggle('ready',ready);setStableText(d.querySelector('.pr'),'Следующий: '+fmt(cost(i))+' · '+fmt(b.p*bmult(i)*smult())+'/сек');setStableText(d.querySelector('.build-cost'),ready?'✓ ×'+n+' за '+fmt(total)+' монет':(n>0?'Нужно ещё '+fmt(Math.max(0,total-S.coins))+' монет':'Недостаточно даже на 1 уровень'));setStableText(d.querySelector('.cnt'),S.own[i]+(ready?' → '+(S.own[i]+n):''));if(ready)readyCount++});const modes=[1,10,100,'max'];buyModes.querySelectorAll('.buy-mode').forEach((b,j)=>{const m=modes[j],ok=BUILD.some((_,i)=>{const n=m==='max'?affordableN(i):m;return n>0&&S.coins>=costN(i,n)});b.classList.toggle('disabled',!ok)});setStableText($('mode-summary'),readyCount?'Доступно зданий для '+(buyMode==='max'?'MAX':('×'+buyMode))+': '+readyCount:'Нет зданий, которые можно купить в выбранном режиме');}
 buildUps();if(T=='ups')upRows.forEach(([d,u])=>d.classList.toggle('no',S.coins<u.c));
 
 const av=dAvail(),tm=fT(dWait());const dtNode=$('dt'),dtText=av?'Забрать!':tm;if(dtNode.textContent!==dtText)dtNode.textContent=dtText;$('dcard').classList.toggle('rdy',av);const ddot=$('ddot'),dotDisplay=av?'block':'none';if(ddot.style.display!==dotDisplay)ddot.style.display=dotDisplay;const dtmNode=$('dtm');if(dtmNode&&dtmNode.textContent!==tm)dtmNode.textContent=tm;
@@ -3018,7 +3041,7 @@ const cl=(A,P,C)=>A().some((x,i)=>!C[i]&&(P[x[0]]||0)>=x[2]);const taskReady=cl(
 let bh='';[['hands','💪'],['recipe','📜']].forEach(([k,e])=>{const r=(S.tb[k]||0)-now();if(r>0)bh+=`<div class="bo" style="background:conic-gradient(var(--gold) ${Math.min(1,r/6e4)*360}deg,#0008 0)"><span>${e}</span><small>${Math.ceil(r/1e3)}с</small></div>`});if($('boosts').dataset.h!=bh){$('boosts').dataset.h=bh;$('boosts').innerHTML=bh}
 const buffNode=$('buff'),buffText=bon()?buff.n+' · '+Math.ceil((buff.until-now())/1e3)+' с':'';if(buffNode.textContent!==buffText)buffNode.textContent=buffText}
 let prev=now();
-BUILD.forEach((b,i)=>{const d=brow[i];d.querySelector('.pr').textContent=fmt(cost(i))});
+BUILD.forEach((b,i)=>{const d=brow[i];setStableText(d.querySelector('.pr'),fmt(cost(i)));});
 const CAPMIN=()=>180+S.offLv*20,off0=Math.min((now()-S.last)/1e3,CAPMIN()*60);
 curBg=-1;ui();buildUps(1);roll();
 if(!S.intro)intro();else if(off0>60&&base()>0){const g=Math.floor(base()*off0*.6);story('👴','С возвращением, внучок!','Пока ты отсутствовал ('+Math.floor(off0/60)+' мин из '+CAPMIN()+' возможных), пекарня заработала '+fmt(g)+' монет. Поздравляю!',()=>{earn(g);confetti(30);sfx('q')},'Получить награду')}
@@ -3123,11 +3146,11 @@ setInterval(save,10000);addEventListener('beforeunload',save);document.addEventL
  function confirmPrestige(){const gain=pgain();if(S.q<8||gain<1){closePrestigePreview();toast(S.q<8?'Перерождение откроется после квеста «Хлебозавод»':'Нужно заработать минимум 50 млн монет за забег');return}audio();S=Object.assign(S,{coins:0,run:0,own:BUILD.map(()=>0),up:{},starter:(Number(S.starter)||0)+gain,starterBonus:(Number(S.starterBonus)||0)+gain,resets:(Number(S.resets)||0)+1,skills:S.skills||{}});clickCombo=0;comboUntil=0;fireTier=0;closePrestigePreview();updateStreak();buildUps(1);save();closeSheet();ui();celebrate('🌾','Новая глава!','Перерождение завершено: +'+gain+' очков закваски. Всего: '+S.starter+'. Открой «Улучшения» и изучи новый навык.');tab('ups',1)}
  window.openPrestigePreview=openPrestigePreview;window.closePrestigePreview=closePrestigePreview;window.confirmPrestige=confirmPrestige;
  // Varied warm lines keep both regular visitors and the grandfather from repeating one cue.
- window.visitor=function(){const msgs=[['👴','Дедушка: «Слышишь? Это тесто тихонько поднимается.»'],['👴','Дедушка: «Хорошая корочка — терпение и немного тепла.»'],['👴','Дедушка: «Поставь ещё одну булочку, внучок: очередь уже у двери.»'],['👴','Дедушка: «В этой лавке всегда найдётся место для доброго слова.»'],['👴','Дедушка: «Какой аромат! Соседи скоро сбегутся.»'],['🧑‍🍳','Пекарь: «Сегодня круассаны получились особенно воздушными!»'],['🧑‍🍳','Пекарь: «У нас уже спрашивают рецепт дедушкиного хлеба.»'],['🧒','Покупатель: «Можно мне ещё одну? Она такая тёплая!»'],['🧑','Гость: «Такой витрины я ещё не видел!»'],['👵','Покупательница: «Ваша пекарня напоминает мне дом.»']];const e=$('visitor');if(!e)return;const [who,text]=msgs[Math.floor(Math.random()*msgs.length)],mark=who==='👴'?`<span class="grandpa-mark">${GRANDPA_ICON}</span>`:`<span class="visitor-mark">${who}</span>`;e.innerHTML=mark+`<span>${text}</span>`;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),6200)};
- window.decorateScene=function(si){const lines=[['Дедушка: «Наша лавка становится всё уютнее.»','Покупатель: «Ещё тёплый хлеб? Беру два!»'],['Дедушка: «Семейный рецепт путешествует дальше.»','Пекарь: «Пироги сегодня разлетятся мгновенно.»'],['Пекарь: «У городской витрины уже очередь!»','Дедушка: «Город знает вкус настоящей выпечки.»'],['Дедушка: «Завод большой, а забота о тесте всё та же.»','Пекарь: «Каждая печь работает как часы.»'],['Гость с Луны: «Здесь пахнет домом, даже среди звёзд.»','Дедушка: «Лунный хлеб тоже нужно печь с душой.»'],['Путешественник: «Через галактику я шёл именно за этими булочками!»','Дедушка: «Звёзды далеко, а добрый рецепт рядом.»']][Math.max(0,Math.min(5,si))];if(Math.random()>.22)return;const line=lines[Math.floor(Math.random()*lines.length)],isGrand=line.startsWith('Дедушка:'),e=$('visitor');if(!e)return;e.innerHTML=(isGrand?`<span class="grandpa-mark">${GRANDPA_ICON}</span>`:'<span class="visitor-mark">🧑‍🍳</span>')+`<span>${line}</span>`;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),5600)};
+ window.visitor=function(){const msgs=[['👴','Дедушка: «Слышишь? Это тесто тихонько поднимается.»'],['👴','Дедушка: «Хорошая корочка — терпение и немного тепла.»'],['👴','Дедушка: «Поставь ещё одну булочку, внучок: очередь уже у двери.»'],['👴','Дедушка: «В этой лавке всегда найдётся место для доброго слова.»'],['👴','Дедушка: «Какой аромат! Соседи скоро сбегутся.»'],['🧑','Пекарь: «Сегодня круассаны получились особенно воздушными!»'],['🧑','Пекарь: «У нас уже спрашивают рецепт дедушкиного хлеба.»'],['🧒','Покупатель: «Можно мне ещё одну? Она такая тёплая!»'],['🧑','Гость: «Такой витрины я ещё не видел!»'],['👵','Покупательница: «Ваша пекарня напоминает мне дом.»']];const e=$('visitor');if(!e)return;const [who,text]=msgs[Math.floor(Math.random()*msgs.length)],mark=who==='👴'?`<span class="grandpa-mark">${GRANDPA_ICON}</span>`:`<span class="visitor-mark">${who}</span>`;e.innerHTML=mark+`<span>${text}</span>`;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),6200)};
+ window.decorateScene=function(si){const lines=[['Дедушка: «Наша лавка становится всё уютнее.»','Покупатель: «Ещё тёплый хлеб? Беру два!»'],['Дедушка: «Семейный рецепт путешествует дальше.»','Пекарь: «Пироги сегодня разлетятся мгновенно.»'],['Пекарь: «У городской витрины уже очередь!»','Дедушка: «Город знает вкус настоящей выпечки.»'],['Дедушка: «Завод большой, а забота о тесте всё та же.»','Пекарь: «Каждая печь работает как часы.»'],['Гость с Луны: «Здесь пахнет домом, даже среди звёзд.»','Дедушка: «Лунный хлеб тоже нужно печь с душой.»'],['Путешественник: «Через галактику я шёл именно за этими булочками!»','Дедушка: «Звёзды далеко, а добрый рецепт рядом.»']][Math.max(0,Math.min(5,si))];if(Math.random()>.22)return;const line=lines[Math.floor(Math.random()*lines.length)],isGrand=line.startsWith('Дедушка:'),e=$('visitor');if(!e)return;e.innerHTML=(isGrand?`<span class="grandpa-mark">${GRANDPA_ICON}</span>`:'<span class="visitor-mark">🧑</span>')+`<span>${line}</span>`;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),5600)};
  // Loading art stays briefly, but never waits indefinitely for a platform SDK.
  let loadingDone=false,loadingTimer=0,loadingStart=performance.now();
- function finishLoading(force=false){if(loadingDone&&!force)return;loadingDone=true;if(loadingTimer){clearTimeout(loadingTimer);loadingTimer=0}const delay=force?0:Math.max(0,7000-(performance.now()-loadingStart));loadingTimer=setTimeout(async()=>{await window.bakeryLanguageReady;const e=$('loading-screen');if(!e)return;document.documentElement.classList.add('app-ready');try{ysdk?.features?.LoadingAPI?.ready()}catch(_){}e.classList.add('hide');setTimeout(()=>e.remove(),500)},delay)}
+ function finishLoading(force=false){if(loadingDone&&!force)return;loadingDone=true;if(loadingTimer){clearTimeout(loadingTimer);loadingTimer=0}const delay=force?0:Math.max(0,3000-(performance.now()-loadingStart));loadingTimer=setTimeout(async()=>{await window.bakeryLanguageReady;const e=$('loading-screen');if(!e)return;document.documentElement.classList.add('app-ready');document.dispatchEvent(new Event('bakery:game-ready'));performance.mark('bakery-ready');try{ysdk?.features?.LoadingAPI?.ready()}catch(_){}e.classList.add('hide');setTimeout(()=>e.remove(),500)},delay)}
  const skip=document.querySelector('.loading-skip');if(skip)skip.onclick=()=>finishLoading(true);
  window.finishLoading=finishLoading;window.addEventListener('load',()=>finishLoading(false),{once:true});setTimeout(()=>finishLoading(false),1900);
  setInterval(updateSaveStatus,1000);
@@ -3470,7 +3493,7 @@ setInterval(save,10000);addEventListener('beforeunload',save);document.addEventL
   const coin=box.querySelector('.coin-upgrades'),tree=box.querySelector('.yeast-tree'),nav=box.querySelector('.upgrade-subnav');
   if(!coin||!tree||!nav)return;
   coin.classList.toggle('is-collapsed',view!=='coin');tree.classList.toggle('is-collapsed',view!=='yeast');
-  nav.querySelectorAll('button').forEach(b=>{const on=b.dataset.upgradeView===view;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on))});
+  nav.querySelectorAll('button').forEach(b=>{const on=b.dataset.upgradeView===view;b.classList.toggle('active',on);if(b.getAttribute('aria-pressed')!==String(on))b.setAttribute('aria-pressed',String(on))});
  }
  window.setUpgradeSubtab=updateSubtab;
  const originalBuildUps=window.buildUps;
@@ -3494,7 +3517,7 @@ setInterval(save,10000);addEventListener('beforeunload',save);document.addEventL
    Array.from(box.children).forEach(el=>{if(el!==nav&&el!==tree)coin.appendChild(el)});
    box.insertBefore(coin,tree);
   }
-  coin.classList.add('upgrade-panel');tree.classList.add('upgrade-panel','v20-yeast-tree');tree.dataset.v20='1';
+  if(!coin.classList.contains('upgrade-panel'))coin.classList.add('upgrade-panel');if(!tree.classList.contains('v20-yeast-tree'))tree.classList.add('upgrade-panel','v20-yeast-tree');if(tree.dataset.v20!=='1')tree.dataset.v20='1';
   const stamp=treeStamp();
   if(tree.dataset.v20Stamp!==stamp){tree.innerHTML=skillTreeMarkup();tree.dataset.v20Stamp=stamp;lastTreeStamp=stamp}
   updateSubtab(window.__upgradeSubtab||'coin');
@@ -3780,7 +3803,7 @@ setInterval(save,10000);addEventListener('beforeunload',save);document.addEventL
  window.bumpBunImpulse=function(x,y,combo){const r=bunRoot&&bunRoot.getBoundingClientRect();if(!r)return;const nx=r.width?clamp((Number(x||r.left+r.width/2)-(r.left+r.width/2))/(r.width/2),-1,1):0,ny=r.height?clamp((Number(y||r.top+r.height/2)-(r.top+r.height/2))/(r.height/2),-1,1):0;const n=Math.max(1,Number(combo)||1),angle=n*2.399963229728653+nx*.72-ny*.38,speed=19+Math.min(17,n/320);bunVX=Math.cos(angle)*speed;bunVY=Math.sin(angle)*speed;window.__bakeryBunVelocity={x:bunVX,y:bunVY};return window.__bakeryBunVelocity};
  function measureBunBounds(){
   if(!bunRoot)return;
-  const core=$('bun');if(!core)return;core.style.setProperty('--bun-inner-x','0px');core.style.setProperty('--bun-inner-y','0px');
+  const core=$('bun');if(!core)return;core.style.setProperty('--bun-offset','translate3d(0,0,0)');
   const r=bunRoot.getBoundingClientRect();
   // The glass ball stays still; the pastry travels gently inside its safe circular boundary.
   bunBounds.x=Math.max(4,r.width*.09);bunBounds.y=Math.max(4,r.height*.09);bunX=clamp(bunX,-bunBounds.x,bunBounds.x);bunY=clamp(bunY,-bunBounds.y,bunBounds.y);
@@ -3798,7 +3821,7 @@ setInterval(save,10000);addEventListener('beforeunload',save);document.addEventL
   let hitX=false,hitY=false;
   if(bunX>bunBounds.x){bunX=bunBounds.x;bunVX=-Math.max(11,Math.abs(bunVX)*.92);hitX=true}else if(bunX< -bunBounds.x){bunX=-bunBounds.x;bunVX=Math.max(11,Math.abs(bunVX)*.92);hitX=true}
   if(bunY>bunBounds.y){bunY=bunBounds.y;bunVY=-Math.max(8,Math.abs(bunVY)*.92);hitY=true}else if(bunY< -bunBounds.y){bunY=-bunBounds.y;bunVY=Math.max(8,Math.abs(bunVY)*.92);hitY=true}
-  const core=$('bun');if(core){core.style.setProperty('--bun-inner-x',bunX.toFixed(1)+'px');core.style.setProperty('--bun-inner-y',bunY.toFixed(1)+'px')}
+  const core=$('bun');if(core){core.style.setProperty('--bun-offset',`translate3d(${bunX.toFixed(1)}px,${bunY.toFixed(1)}px,0)`)}
   if(hitX)wallSquish(bunVX<0?'right':'left');else if(hitY)wallSquish('center');
  }
  measureBunBounds();requestAnimationFrame(()=>measureBunBounds());window.addEventListener('load',()=>{measureBunBounds();setTimeout(measureBunBounds,400);setTimeout(measureBunBounds,2000)},{passive:true});setTimeout(measureBunBounds,1200);window.addEventListener('resize',()=>{measureBunBounds();curBg=-1;ui()},{passive:true});window.addEventListener('orientationchange',()=>setTimeout(measureBunBounds,120),{passive:true});bunRAF=requestAnimationFrame(animateBun);
@@ -3852,7 +3875,7 @@ setInterval(save,10000);addEventListener('beforeunload',save);document.addEventL
  }
  const skinNames=PASTRY_NAMES.slice(0,18);
  const skinPrices=[
-  {coins:0},{coins:250},{coins:1200},{coins:6000},{coins:30000},{coins:140000},{coins:700000},{coins:3500000},{coins:18000000},{coins:90000000},{coins:450000000},{coins:2300000000},
+  {coins:0},{coins:250},{coins:6000},{coins:1200},{coins:30000},{coins:140000},{coins:700000},{coins:3500000},{coins:18000000},{coins:90000000},{coins:450000000},{coins:2300000000},
   {coins:10000000000,gems:30},{coins:50000000000,gems:60},{coins:250000000000,gems:100},{coins:1000000000000,gems:175},
   {coins:5000000000000,gems:250,yeast:5},{coins:25000000000000,gems:400,yeast:10},{coins:120000000000000,gems:650,yeast:20},{coins:800000000000000,gems:1000,yeast:35}
  ];
@@ -3958,7 +3981,7 @@ setInterval(save,10000);addEventListener('beforeunload',save);document.addEventL
  }
  window.openBunSkinDetail=renderSkinDetail;
  window.buyBunSkin=function(index){
-  const i=Math.floor(number(index)),b=BUN_SKINS[i];if(!b||owned(i))return false;if(!isStorySkinOpen(i)){toast('Эта булочка ещё закрыта сюжетом');return false}const p=b.price;
+  const i=Math.floor(number(index)),b=BUN_SKINS[i];if(!b||owned(i))return false;if(!isStorySkinOpen(i)){toast('Эта булочка ещё закрыта сюжетом');return false}const p={coins:number(b.price.coins),gems:number(b.price.gems),yeast:number(b.price.yeast)};
   if(number(S.coins)<p.coins||number(S.gems)<p.gems||number(S.starter)<p.yeast){sfx('no');toast('Не хватает валюты для этой булочки');return false}
   S.coins-=p.coins;S.gems-=p.gems;S.starter-=p.yeast;S.bunSkinOwned[i]=1;S.bunSkinOrder.push(i);save();sfx('buy');confetti(12);ui();renderSkinDetail(i,window.__v22SkinDetail?.from||'shop');toast('Скин приобретён: '+b.name);return true;
  };
@@ -4193,7 +4216,7 @@ setInterval(save,10000);addEventListener('beforeunload',save);document.addEventL
   if(Number(S.activeBunSkin)>=18){S.activeBunSkin=0;migrated=true}
   if(migrated&&typeof save==='function')save();
  }
- const upd=window.updateNavHeader;if(typeof upd==='function')window.updateNavHeader=function(){const b=$('sh-back');if(!b)return;const allowed=T!=='more'&&T!=='build'&&T!=='ups'&&T!=='shop'&&T!=='pass'&&T!=='tasks'&&T!=='daily'&&T!=='prestige'&&tabHistory?.includes('more');b.hidden=!allowed};
+ const upd=window.updateNavHeader;if(typeof upd==='function')window.updateNavHeader=function(){const b=$('sh-back');if(!b)return;const allowed=T!=='more'&&T!=='build'&&T!=='ups'&&T!=='shop'&&T!=='pass'&&T!=='tasks'&&T!=='daily'&&T!=='prestige'&&tabHistory?.includes('more');if(b.hidden!==!allowed)b.hidden=!allowed};
  const back=$('sh-back');if(back&&typeof window.updateNavHeader==='function')window.updateNavHeader();
  const originalAudio=window.audio;if(typeof originalAudio==='function')window.audio=function(){if(document.hidden)return;return originalAudio.apply(this,arguments)};
  const originalSfx=window.sfx;if(typeof originalSfx==='function')window.sfx=function(){if(document.hidden)return;return originalSfx.apply(this,arguments)};
@@ -4265,7 +4288,7 @@ setInterval(save,10000);addEventListener('beforeunload',save);document.addEventL
 (()=>{
  'use strict';
  const finite=(value,fallback=0)=>{const n=Number(value);return Number.isFinite(n)?n:fallback};
- const syncGems=()=>{if(typeof S==='undefined'||!S)return;const value=Math.max(0,Math.floor(finite(S.gems)));if(S.gems!==value)S.gems=value;const node=document.getElementById('gems');if(node){const html='<span class="gm" aria-hidden="true">💎</span> '+fmt(value);if(node.innerHTML!==html)node.innerHTML=html;node.setAttribute('aria-label','Кристаллы: '+fmt(value))}};
+ const syncGems=()=>{if(typeof S==='undefined'||!S)return;const value=Math.max(0,Math.floor(finite(S.gems)));if(S.gems!==value)S.gems=value;const node=document.getElementById('gems');if(node){const html='<span class="gm" aria-hidden="true">💎</span> '+fmt(value);if(node.innerHTML!==html)node.innerHTML=html;if(node.getAttribute('aria-label')!=='Кристаллы: '+fmt(value))node.setAttribute('aria-label','Кристаллы: '+fmt(value))}};
  window.v37SyncGemCounter=syncGems;syncGems();
  const arrangeStreak=()=>{const streak=document.getElementById('streak'),tasks=document.getElementById('tasks'),left=document.querySelector('#frame-controls .v25-left');if(streak&&tasks&&left&&streak.parentElement!==left)tasks.insertAdjacentElement('afterend',streak)};
  const oldUi=window.ui;if(typeof oldUi==='function')window.ui=function(){const result=oldUi.apply(this,arguments);syncGems();arrangeStreak();return result};
@@ -4273,7 +4296,7 @@ setInterval(save,10000);addEventListener('beforeunload',save);document.addEventL
  for(const name of ['grant','gemBuy','dClaim','qc','claim','claimTaskFast','claimChall','buyBunSkin','wearBunSkin']){const original=window[name];if(typeof original==='function')window[name]=function(){const result=original.apply(this,arguments);syncGems();arrangeStreak();return result}}
  arrangeStreak();new MutationObserver(arrangeStreak).observe(document.body,{childList:true,subtree:true});
  const sheet=document.getElementById('sheet');if(sheet){const syncDetail=()=>sheet.classList.toggle('skin-detail-open',!!sheet.querySelector('.skin-detail-view'));new MutationObserver(syncDetail).observe(sheet,{childList:true,subtree:true});syncDetail()}
- setInterval(syncGems,120);
+ // Gem counter updates through ui/save/reward hooks, without a competing polling loop.
  document.addEventListener('visibilitychange',()=>{if(!document.hidden){try{roll()}catch(_){}syncGems();window.ui?.();window.save?.()}});
  try{document.title='Булочная империя'}catch(_){}
 })();
@@ -4597,14 +4620,15 @@ setInterval(save,10000);addEventListener('beforeunload',save);document.addEventL
 
  /* ===== 5. Страховка: ни одного нарисованного кристалла ===== */
  function emojiGems(root){
-  (root||document).querySelectorAll('.gm,.orb-gem,.v31-gem-icon,.v30-reward-icon').forEach(el=>{
+  const scope=root||document,selector='.gm,.orb-gem,.v31-gem-icon,.v30-reward-icon';
+  [...(scope.matches?.(selector)?[scope]:[]),...scope.querySelectorAll(selector)].forEach(el=>{
    el.querySelectorAll('svg').forEach(s=>s.remove());
    const txt=(el.textContent||'').trim();
    if(!txt)el.textContent='💎';
   });
  }
  emojiGems();
- new MutationObserver(r=>r.forEach(x=>x.addedNodes.forEach(n=>{if(n.nodeType===1)emojiGems(n.parentNode||n)}))).observe(document.body,{childList:true,subtree:true});
+ new MutationObserver(r=>r.forEach(x=>x.addedNodes.forEach(n=>{if(n.nodeType===1)emojiGems(n)}))).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
 
@@ -4851,5 +4875,8 @@ setInterval(save,10000);addEventListener('beforeunload',save);document.addEventL
 </script>
 <!-- Рейтинг пекарей (работает только если развёрнут воркер) -->
 <script src="./tg-leaderboard.js"></script>
-</body>
+<style id="header-safe-layout">
+body.quality-performance .bub,body.quality-performance .reward-orb,body.quality-performance #sheet,body.quality-performance #v30-modal{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+@media(max-width:800px){#stage{position:fixed!important;top:calc(140px + env(safe-area-inset-top))!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;max-width:calc(100vw - 40px)!important;width:max-content!important;font-size:clamp(12px,3.8vw,17px)!important;max-height:48px;overflow:hidden;padding:6px 14px!important}}
+</style><style>#visitor#visitor{width:max-content!important;max-width:min(36rem,calc(100vw - 36px))!important;box-sizing:border-box;left:50%!important;right:auto!important;padding:6px 12px!important;border-radius:14px!important;white-space:normal!important;overflow-wrap:anywhere;text-align:center;pointer-events:none}</style><style>#visitor .visitor-mark,#visitor .grandpa-mark{background:transparent!important;border:0!important;box-shadow:none!important}#sheet.open:has(#p_dyn.on .stat-grid){padding-bottom:max(10px,env(safe-area-inset-bottom))!important}</style></body>
 </html>
