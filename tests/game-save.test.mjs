@@ -1,0 +1,14 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
+const base=html.split('\n').find(l=>l.startsWith('const BUILD='));
+const additions=html.split('\n').filter(l=>l.includes('BUILD.push({v22Id:'));
+const fresh=html.split('\n').find(l=>l.startsWith('const fresh='));
+const state=vm.runInNewContext(base+'\n'+additions.join('\n')+'\n'+fresh+'\nfresh()', {OVEN_ICON:'',MILL_ICON:'',DIFF:1,santaSleigh:'',giftFactory:''});
+const server=fs.readFileSync(new URL('../server/worker.mjs',import.meta.url),'utf8');
+const validServer=vm.runInNewContext(server.slice(server.indexOf('function validSave('),server.indexOf('\nasync function authenticate(')).split('\nfunction hex')[0]+'\nvalidSave');
+const client=fs.readFileSync(new URL('../cloud-saves.js',import.meta.url),'utf8');
+const validClient=vm.runInNewContext(client.slice(client.indexOf('function valid('),client.indexOf('\nfunction copy('))+'\nvalid',{TextEncoder});
+test('actual game fresh() with seasonal BUILD additions fits both validators',()=>{assert.equal(state.own.length,14);for(const valid of [validClient,validServer]){assert.equal(valid(state),true);assert.equal(valid({...state,own:Array(13).fill(0)}),false);assert.equal(valid({...state,own:Array(14).fill(-1)}),false);}const bytes=Buffer.byteLength(JSON.stringify(state));assert.ok(bytes<262144);console.log('Actual fresh save bytes:',bytes,'PUT bytes:',Buffer.byteLength(JSON.stringify({revision:0,data:state})));assert.equal(validClient({...state,extra:'x'.repeat(262144)}),false);});
